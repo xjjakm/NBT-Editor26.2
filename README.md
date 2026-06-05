@@ -1,6 +1,6 @@
-# NBT-Editor - 1.21.10
+# NBT-Editor - 26.1.x
 
-omg i love 1.21.10 thanks thorioum
+This mod can run on MC version 26.1, and bugs will not be fixed.
 
 This is a mod built for editing items, blocks, and entities in Minecraft.
 
