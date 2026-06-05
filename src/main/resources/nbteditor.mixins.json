@@ -1,0 +1,44 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.luneruniverse.minecraft.mod.nbteditor.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "plugin": "com.luneruniverse.minecraft.mod.nbteditor.mixin.toggled.NBTEditorMixinPlugin",
+  "mixins": [
+    "BlockableEventLoopMixin",
+    "ManySlotMixin",
+    "ServerGamePacketListenerImplMixin",
+    "ServerPlayerMixin",
+    "SynchedEntityDataMixin"
+  ],
+  "client": [
+    "RegistryEntryMixin",
+    "AbstractContainerMenuMixin",
+    "AbstractContainerScreenAccessor",
+    "AbstractContainerScreenMixin",
+    "BookViewScreenMixin",
+    "ChatScreenAccessor",
+    "ChatScreenMixin",
+    "ClientPacketListenerMixin",
+    "CommandSuggestionsMixin",
+    "CompoundTagMixin",
+    "ConnectionMixin",
+    "CreativeModeInventoryScreenMixin",
+    "EditBoxMixin",
+    "EnchantmentMixin",
+    "IdMapMixin",
+    "ItemStackMixin",
+    "KeyboardHandlerMixin",
+    "LoadingOverlayMixin",
+    "LocalPlayerMixin",
+    "MinecraftMixin",
+    "NativeImageMixin",
+    "ScreenMixin",
+    "ScreenshotMixin",
+    "StringTagVisitorAccessor",
+    "UtilMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

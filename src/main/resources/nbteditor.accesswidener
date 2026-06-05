@@ -1,0 +1,82 @@
+accessWidener v1 official
+
+accessible class net/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen$SlotWrapper
+accessible field net/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen$SlotWrapper target Lnet/minecraft/world/inventory/Slot;
+
+accessible field net/minecraft/nbt/TagTypes TYPES [Lnet/minecraft/nbt/TagType;
+
+accessible field net/minecraft/client/gui/components/EditBox value Ljava/lang/String;
+
+accessible method net/minecraft/client/gui/screens/Screen addRenderableWidget (Lnet/minecraft/client/gui/components/events/GuiEventListener;)Lnet/minecraft/client/gui/components/events/GuiEventListener;
+
+accessible method net/minecraft/client/gui/screens/MenuScreens register (Lnet/minecraft/world/inventory/MenuType;Lnet/minecraft/client/gui/screens/MenuScreens$ScreenConstructor;)V
+accessible class net/minecraft/client/gui/screens/MenuScreens$ScreenConstructor
+
+accessible field net/minecraft/client/gui/components/AbstractWidget x I
+accessible field net/minecraft/client/gui/components/AbstractWidget y I
+
+accessible field net/minecraft/network/chat/Style bold Ljava/lang/Boolean;
+accessible field net/minecraft/network/chat/Style italic Ljava/lang/Boolean;
+accessible field net/minecraft/network/chat/Style underlined Ljava/lang/Boolean;
+accessible field net/minecraft/network/chat/Style strikethrough Ljava/lang/Boolean;
+accessible field net/minecraft/network/chat/Style obfuscated Ljava/lang/Boolean;
+accessible method net/minecraft/world/level/storage/TagValueOutput <init> (Lnet/minecraft/util/ProblemReporter;Lcom/mojang/serialization/DynamicOps;Lnet/minecraft/nbt/CompoundTag;)V
+
+accessible field net/minecraft/client/gui/components/EditBox formatters Ljava/util/List;
+
+accessible field net/minecraft/server/level/ServerPlayer server Lnet/minecraft/server/MinecraftServer;
+
+accessible field net/minecraft/client/gui/components/CommandSuggestions currentParse Lcom/mojang/brigadier/ParseResults;
+accessible field net/minecraft/client/gui/components/CommandSuggestions keepSuggestions Z
+accessible field net/minecraft/client/gui/components/CommandSuggestions suggestions Lnet/minecraft/client/gui/components/CommandSuggestions$SuggestionsList;
+accessible field net/minecraft/client/gui/components/CommandSuggestions commandUsage Ljava/util/List;
+accessible field net/minecraft/client/gui/components/CommandSuggestions pendingSuggestions Ljava/util/concurrent/CompletableFuture;
+extendable method net/minecraft/client/gui/components/CommandSuggestions formatChat (Ljava/lang/String;I)Lnet/minecraft/util/FormattedCharSequence;
+accessible field net/minecraft/client/gui/components/CommandSuggestions$SuggestionsList rect Lnet/minecraft/client/renderer/Rect2i;
+
+accessible field net/minecraft/network/syncher/SynchedEntityData$DataItem initialValue Ljava/lang/Object;
+
+accessible field net/minecraft/commands/arguments/blocks/BlockInput tag Lnet/minecraft/nbt/CompoundTag;
+
+accessible field net/minecraft/world/inventory/LecternMenu lectern Lnet/minecraft/world/Container;
+
+accessible field net/minecraft/world/item/Rarity color Lnet/minecraft/ChatFormatting;
+
+accessible method net/minecraft/world/item/enchantment/ItemEnchantments <init> (Lit/unimi/dsi/fastutil/objects/Object2IntOpenHashMap;)V
+
+accessible field net/minecraft/client/renderer/GameRenderer renderBuffers Lnet/minecraft/client/renderer/RenderBuffers;
+
+accessible field net/minecraft/nbt/StringTagVisitor UNQUOTED_KEY_MATCH Ljava/util/regex/Pattern;
+
+accessible field net/minecraft/core/Holder$Reference owner Lnet/minecraft/core/HolderOwner;
+
+accessible class com/mojang/blaze3d/opengl/GlStateManager$ScissorState
+accessible class com/mojang/blaze3d/opengl/GlStateManager$BooleanState
+accessible field com/mojang/blaze3d/opengl/GlStateManager SCISSOR Lcom/mojang/blaze3d/opengl/GlStateManager$ScissorState;
+accessible field com/mojang/blaze3d/opengl/GlStateManager$BooleanState enabled Z
+
+accessible field net/minecraft/client/Minecraft fontManager Lnet/minecraft/client/gui/font/FontManager;
+accessible field net/minecraft/client/gui/font/FontManager fontSets Ljava/util/Map;
+
+accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen skipNextRelease Z
+
+extendable method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen tick ()V
+
+accessible field net/minecraft/world/entity/player/Inventory selected I
+accessible field net/minecraft/client/renderer/blockentity/BlockEntityRenderDispatcher cameraPos Lnet/minecraft/world/phys/Vec3;
+accessible field net/minecraft/world/level/storage/TagValueOutput output Lnet/minecraft/nbt/CompoundTag;
+accessible field net/minecraft/client/renderer/LevelRenderer levelRenderState Lnet/minecraft/client/renderer/state/level/LevelRenderState;
+accessible field net/minecraft/client/renderer/LevelRenderer submitNodeStorage Lnet/minecraft/client/renderer/SubmitNodeStorage;
+
+accessible field net/minecraft/world/inventory/AbstractContainerMenu remoteCarried Lnet/minecraft/world/inventory/RemoteSlot;
+
+accessible field net/minecraft/world/item/BoatItem entityType Lnet/minecraft/world/entity/EntityType;
+
+accessible method net/minecraft/client/gui/components/CommandSuggestions updateUsageInfo (Lcom/mojang/brigadier/ParseResults;Lcom/mojang/brigadier/suggestion/Suggestions;)V
+
+accessible method net/minecraft/client/gui/screens/Screen defaultHandleGameClickEvent (Lnet/minecraft/network/chat/ClickEvent;Lnet/minecraft/client/Minecraft;Lnet/minecraft/client/gui/screens/Screen;)V
+
+accessible method net/minecraft/core/Holder$Reference boundTags ()Ljava/util/Set;
+
+# Private in older versions
+accessible method net/minecraft/network/chat/TextColor formatValue ()Ljava/lang/String;
