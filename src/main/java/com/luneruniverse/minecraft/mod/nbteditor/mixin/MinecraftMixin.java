@@ -33,11 +33,13 @@ public class MinecraftMixin {
 	@Inject(method = "setScreen", at = @At("HEAD"))
 	private void setScreen(Screen screen, CallbackInfo info) {
 		if (screen == null) {
-			NBTEditorClient.CURSOR_MANAGER.onNoScreenSet();
+			if (NBTEditorClient.CURSOR_MANAGER != null)
+				NBTEditorClient.CURSOR_MANAGER.onNoScreenSet();
 		} else if (screen instanceof AbstractContainerScreen<?> handledScreen) {
 			for (Slot slot : handledScreen.getMenu().slots)
 				ServerMixinLink.SLOT_OWNER.put(slot, MainUtil.client.player);
-			NBTEditorClient.CURSOR_MANAGER.onHandledScreenSet(handledScreen);
+			if (NBTEditorClient.CURSOR_MANAGER != null)
+				NBTEditorClient.CURSOR_MANAGER.onHandledScreenSet(handledScreen);
 		}
 	}
 	
