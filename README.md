@@ -1,8 +1,9 @@
 # NBT-Editor - 26.2
 
-This mod can run on MC version 26.2
+This mod can run on MC version 26.2,I know the code has a lot of issues, but the main functions can run.
+supports the latest Vulkan rendering API.
 
-This project has rewritten a lot of code, so please be sure to report any issues, and it supports the latest Vulkan rendering API.
+If you have any suggestions for changes, please create a pull request.
 
 This is a mod built for editing items, blocks, and entities in Minecraft.
 
