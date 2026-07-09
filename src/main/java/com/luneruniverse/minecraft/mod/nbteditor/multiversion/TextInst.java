@@ -1,27 +1,15 @@
 package com.luneruniverse.minecraft.mod.nbteditor.multiversion;
 
-import java.lang.invoke.MethodType;
-import java.util.function.Supplier;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
-import net.minecraft.data.registries.VanillaRegistries;
-import net.minecraft.nbt.*;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtFormatException;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.nbt.TagParser;
-import org.jetbrains.annotations.Nullable;
-
 import com.google.gson.JsonParseException;
+import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
 import com.luneruniverse.minecraft.mod.nbteditor.util.TextUtil;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-
-import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.data.registries.VanillaRegistries;
+import net.minecraft.nbt.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.network.chat.MutableComponent;
+import org.jetbrains.annotations.Nullable;
 
 public class TextInst {
 	

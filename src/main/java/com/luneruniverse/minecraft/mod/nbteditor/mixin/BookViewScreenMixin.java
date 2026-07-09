@@ -1,16 +1,5 @@
 package com.luneruniverse.minecraft.mod.nbteditor.mixin;
 
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
-
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Group;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
 import com.luneruniverse.minecraft.mod.nbteditor.NBTEditorClient;
 import com.luneruniverse.minecraft.mod.nbteditor.commands.factories.BookCommand;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVDrawableHelper;
@@ -23,15 +12,25 @@ import com.luneruniverse.minecraft.mod.nbteditor.nbtreferences.itemreferences.It
 import com.luneruniverse.minecraft.mod.nbteditor.screens.OverlaySupportingScreen;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.BookViewScreen;
 import net.minecraft.client.gui.screens.inventory.BookViewScreen.BookAccess;
 import net.minecraft.client.gui.screens.inventory.LecternScreen;
-import net.minecraft.client.gui.components.Button;
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Group;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 @Mixin(BookViewScreen.class)
 public class BookViewScreenMixin extends Screen {
@@ -41,14 +40,18 @@ public class BookViewScreenMixin extends Screen {
 	@Shadow
 	private int currentPage;
 	
+	@Unique
 	private boolean renderLogo;
+	@Unique
 	private Button openBtn;
+	@Unique
 	private Button convertBtn;
 	
 	protected BookViewScreenMixin() {
-		super(null);
+		super(Component.empty());
 	}
 	
+	@Unique
 	private CompletableFuture<Optional<ItemReference>> getReference() {
 		if ((Object) this instanceof LecternScreen) {
 			return BlockReference.getLecternBlock().thenApply(optionalRef -> {
@@ -67,13 +70,14 @@ public class BookViewScreenMixin extends Screen {
 			return CompletableFuture.completedFuture(Optional.empty());
 		}
 	}
+	@Unique
 	private void getReference(Consumer<ItemReference> consumer) {
 		getReference().thenAccept(ref -> MainUtil.client.execute(() -> ref.ifPresent(consumer)));
 	}
 	
+	@Unique
 	private void updateButtons(BookAccess contents) {
-		boolean editable = (!((Object) this instanceof LecternScreen) || NBTEditorClient.SERVER_CONN.isEditingExpanded()) &&
-				NBTEditorClient.SERVER_CONN.isEditingAllowed() && MVMisc.isWrittenBookContents(contents);
+		boolean editable = NBTEditorClient.SERVER_CONN.isEditingAllowed() && MVMisc.isWrittenBookContents(contents);
 		renderLogo = editable;
 		openBtn.visible = editable;
 		convertBtn.visible = editable;
@@ -81,27 +85,21 @@ public class BookViewScreenMixin extends Screen {
 	
 	@Inject(method = "init", at = @At("TAIL"))
 	private void init(CallbackInfo info) {
-		if (MainUtil.client.screen instanceof
+		if (MainUtil.client.gui.screen() instanceof
 				com.luneruniverse.minecraft.mod.nbteditor.screens.factories.BookScreen) { // Preview mode
 			renderLogo = true;
 			return;
 		}
 		
-		openBtn = addRenderableWidget(MVMisc.newButton(16, 64, 100, 20, TextInst.translatable("nbteditor.book.open"), btn -> {
-			getReference(ref -> {
-				if ((Object) this instanceof LecternScreen)
-					MainUtil.client.player.closeContainer();
-				MainUtil.client.setScreen(
-						new com.luneruniverse.minecraft.mod.nbteditor.screens.factories.BookScreen(ref, Math.max(0, currentPage)));
-			});
-		}));
+		openBtn = addRenderableWidget(MVMisc.newButton(16, 64, 100, 20, TextInst.translatable("nbteditor.book.open"), _ -> getReference(ref ->
+				MainUtil.client.gui.setScreen(
+						new com.luneruniverse.minecraft.mod.nbteditor.screens.factories.BookScreen(ref, Math.max(0, currentPage))))));
 		convertBtn = addRenderableWidget(MVMisc.newButton(16, 64 + 24, 100, 20, TextInst.translatable("nbteditor.book.convert"),
-				btn -> getReference(itemRef -> {
+				_ -> getReference(itemRef -> {
 					if (BookCommand.convertBookToWritable(itemRef)) {
 						openBtn.visible = false;
 						convertBtn.visible = false;
-						if (!((Object) this instanceof LecternScreen))
-							onClose();
+						onClose();
 					}
 				})));
 		
@@ -115,11 +113,11 @@ public class BookViewScreenMixin extends Screen {
 	
 	@Inject(method = "createMenuControls", at = @At("HEAD"), cancellable = true)
 	private void addCloseButton(CallbackInfo info) {
-		if (MainUtil.client.screen instanceof
+		if (MainUtil.client.gui.screen() instanceof
 				com.luneruniverse.minecraft.mod.nbteditor.screens.factories.BookScreen) { // Preview mode
 			info.cancel();
 			addRenderableWidget(MVMisc.newButton(width / 2 - 100, 196, 200, 20, ScreenTexts.DONE,
-					btn -> OverlaySupportingScreen.setOverlayStatic(null)));
+					_ -> OverlaySupportingScreen.setOverlayStatic(null)));
 		}
 	}
 

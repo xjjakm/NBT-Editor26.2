@@ -1,16 +1,9 @@
 package com.luneruniverse.minecraft.mod.nbteditor.multiversion.networking;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
-
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.DynamicRegistryManagerHolder;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
-
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
@@ -18,6 +11,12 @@ import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.resources.Identifier;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
 public class MVClientNetworking {
 	
@@ -47,9 +46,7 @@ public class MVClientNetworking {
 	
 	public static void onPlayStart(ClientPacketListener networkHandler) {
 		Version.newSwitch()
-				.range("1.20.5", null, () -> {
-					DynamicRegistryManagerHolder.setClientManager(networkHandler);
-				})
+				.range("1.20.5", null, () -> DynamicRegistryManagerHolder.setClientManager(networkHandler))
 				.range(null, "1.20.4", () -> {})
 				.run();
 		
@@ -62,9 +59,7 @@ public class MVClientNetworking {
 		PlayNetworkStateEvents.Stop.EVENT.invoker().onPlayStop();
 		
 		Version.newSwitch()
-				.range("1.20.5", null, () -> {
-					DynamicRegistryManagerHolder.setClientManager(null);
-				})
+				.range("1.20.5", null, () -> DynamicRegistryManagerHolder.setClientManager(null))
 				.range(null, "1.20.4", () -> {})
 				.run();
 	}

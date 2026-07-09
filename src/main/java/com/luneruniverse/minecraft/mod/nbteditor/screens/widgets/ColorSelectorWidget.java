@@ -1,26 +1,18 @@
 package com.luneruniverse.minecraft.mod.nbteditor.screens.widgets;
 
-import java.awt.Color;
-import java.util.function.Consumer;
-
-import net.minecraft.client.input.MouseButtonEvent;
+import com.luneruniverse.minecraft.mod.nbteditor.misc.Shaders;
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.*;
+import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.Mth;
 import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 
-import com.luneruniverse.minecraft.mod.nbteditor.misc.Shaders;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.IdentifierInst;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVDrawable;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVDrawableHelper;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVElement;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVSliderWidget;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
-import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
-
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.Mth;
+import java.awt.*;
+import java.util.function.Consumer;
 
 public class ColorSelectorWidget extends GroupWidget {
 	
@@ -65,7 +57,7 @@ public class ColorSelectorWidget extends GroupWidget {
 	private class ColorArea implements MVDrawable, MVElement {
 		@Override
 		public void extractRenderState(Matrix3x2fStack matrices, int mouseX, int mouseY, float delta) {
-			MainUtil.fillShader(matrices, Shaders.POSITION_HSV, vertex -> MVMisc.setVertexLight(vertex, hueValue), x, y, areaSize, areaSize);
+			MainUtil.fillShader(matrices, Shaders.POSITION_HSV, hueValue, x, y, areaSize, areaSize);
 		}
 		@Override
 		public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {

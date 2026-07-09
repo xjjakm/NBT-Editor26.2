@@ -1,9 +1,9 @@
 package tsp.headdb.ported.inventory;
 
+import net.minecraft.world.item.ItemStack;
+
 import java.util.Objects;
 import java.util.function.Consumer;
-
-import net.minecraft.world.item.ItemStack;
 
 /**
  * A button
@@ -62,10 +62,9 @@ public class Button {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Button)) {
+        if (!(o instanceof Button button)) {
             return false;
         }
-        Button button = (Button) o;
         return ID == button.ID;
     }
 

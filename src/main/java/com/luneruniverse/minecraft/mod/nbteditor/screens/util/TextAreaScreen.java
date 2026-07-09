@@ -1,9 +1,5 @@
 package com.luneruniverse.minecraft.mod.nbteditor.screens.util;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVDrawableHelper;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.ScreenTexts;
@@ -12,12 +8,14 @@ import com.luneruniverse.minecraft.mod.nbteditor.screens.OverlaySupportingScreen
 import com.luneruniverse.minecraft.mod.nbteditor.screens.widgets.MultiLineTextFieldWidget;
 import com.luneruniverse.minecraft.mod.nbteditor.util.NbtFormatter;
 import com.mojang.brigadier.suggestion.Suggestions;
-
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
-import com.mojang.blaze3d.vertex.PoseStack;
 import org.joml.Matrix3x2fStack;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 public class TextAreaScreen extends OverlaySupportingScreen {
 	
@@ -55,21 +53,19 @@ public class TextAreaScreen extends OverlaySupportingScreen {
 		MVMisc.setKeyboardRepeatEvents(true);
 		
 		Button done;
-		this.addRenderableWidget(done = MVMisc.newButton(20, 20, Math.min(200, width / 2 - 25), 20, ScreenTexts.DONE, btn -> {
+		this.addRenderableWidget(done = MVMisc.newButton(20, 20, Math.min(200, width / 2 - 25), 20, ScreenTexts.DONE, _ -> {
 			onDone.accept(text);
 			onClose();
 		}));
 		if (width - (done.getWidth() * 2 + 50) < 100) // When the end of the second button is near the end of the text field, it looks bad
 			done.setWidth(done.getWidth() * 2 / 3);
-		this.addRenderableWidget(MVMisc.newButton(done.x + done.getWidth() + 10, 20, done.getWidth(), 20, ScreenTexts.CANCEL, btn -> onClose()));
+		this.addRenderableWidget(MVMisc.newButton(done.x + done.getWidth() + 10, 20, done.getWidth(), 20, ScreenTexts.CANCEL, _ -> onClose()));
 
 		textArea = addRenderableWidget(MultiLineTextFieldWidget.create(textArea, 20, 50, width - 40, height - 70, text, formatter == null ? null : str -> {
 			NbtFormatter.FormatterResult formattedText = formatter.formatSafely(str);
 			done.active = formattedText.isSuccess();
 			return formattedText.text();
-		}, newLines, newText -> {
-			text = newText;
-		}));
+		}, newLines, newText -> text = newText));
 		if (suggestions != null)
 			textArea.suggest(this, suggestions);
 		setInitialFocus(textArea);
@@ -95,7 +91,7 @@ public class TextAreaScreen extends OverlaySupportingScreen {
 	
 	@Override
 	public void onClose() {
-		this.minecraft.setScreen(parent);
+		this.minecraft.gui.setScreen(parent);
 	}
 	
 	@Override

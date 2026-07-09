@@ -1,15 +1,5 @@
 package com.luneruniverse.minecraft.mod.nbteditor.util;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.google.gson.JsonParseException;
 import com.luneruniverse.minecraft.mod.nbteditor.NBTEditor;
 import com.luneruniverse.minecraft.mod.nbteditor.fancytext.FancyText;
@@ -20,12 +10,22 @@ import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVTextEvents;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.util.FancyConfirmScreen;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-
+import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.NbtFormatException;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText.StyledContentConsumer;
 import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.Component;
-import net.minecraft.ChatFormatting;
+import org.jspecify.annotations.Nullable;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TextUtil {
 	
@@ -61,7 +61,7 @@ public class TextUtil {
 		List<Component> lines = getLongTranslatableTextLines(key);
 		if (lines.isEmpty())
 			return TextInst.of(key);
-		EditableText output = TextInst.copy(lines.get(0));
+		EditableText output = TextInst.copy(lines.getFirst());
 		for (int i = 1; i < lines.size(); i++)
 			output.append("\n").append(lines.get(i));
 		return output;
@@ -76,7 +76,7 @@ public class TextUtil {
 		text.visit(new StyledContentConsumer<Boolean>() {
 			private int i;
 			@Override
-			public Optional<Boolean> accept(Style style, String str) {
+			public @Nullable Optional<Boolean> accept(Style style, String str) {
 				if (i + str.length() <= start) {
 					i += str.length();
 					return Optional.empty();
@@ -152,21 +152,24 @@ public class TextUtil {
 				style.withClickEvent(MVTextEvents.ClickAction.OPEN_FILE.newEvent(
 						file.getAbsoluteFile().getParentFile().getAbsolutePath()))))
 				.append(" ").append(TextInst.translatable("nbteditor.file_options.delete").styled(style ->
-				MixinLink.withRunClickEvent(style, () -> MainUtil.client.setScreen(
+				MixinLink.withRunClickEvent(style, () -> MainUtil.client.gui.setScreen(
 						new FancyConfirmScreen(confirmed -> {
 							if (confirmed) {
-								if (file.exists()) {
-									try {
-										Files.deleteIfExists(file.toPath());
-										MainUtil.client.player.sendSystemMessage(TextInst.translatable("nbteditor.file_options.delete.success", "§6" + file.getName()));
-									} catch (IOException e) {
-										NBTEditor.LOGGER.error("Error deleting file", e);
-										MainUtil.client.player.sendSystemMessage(TextInst.translatable("nbteditor.file_options.delete.error", "§6" + file.getName()));
-									}
-								} else
-									MainUtil.client.player.sendSystemMessage(TextInst.translatable("nbteditor.file_options.delete.missing", "§6" + file.getName()));
-							}
-							MainUtil.client.setScreen(null);
+							var player = MainUtil.client.player;
+							if (file.exists()) {
+								try {
+									Files.deleteIfExists(file.toPath());
+									if (player != null)
+										player.sendSystemMessage(TextInst.translatable("nbteditor.file_options.delete.success", "§6" + file.getName()));
+								} catch (IOException e) {
+									NBTEditor.LOGGER.error("Error deleting file", e);
+									if (player != null)
+										player.sendSystemMessage(TextInst.translatable("nbteditor.file_options.delete.error", "§6" + file.getName()));
+								}
+							} else if (player != null)
+								player.sendSystemMessage(TextInst.translatable("nbteditor.file_options.delete.missing", "§6" + file.getName()));
+						}
+							MainUtil.client.gui.setScreen(null);
 						}, TextInst.translatable("nbteditor.file_options.delete.title", file.getName()),
 								TextInst.translatable("nbteditor.file_options.delete.desc", file.getName()))))));
 	}
@@ -201,13 +204,15 @@ public class TextUtil {
 			Component output = TextInst.fromString(str, eitherFormat);
 			if (output != null)
 				return output;
-		} catch (IllegalArgumentException e) {}
+		} catch (IllegalArgumentException e) { // Ignored
+		}
 		return TextInst.of(str);
 	}
 	public static Component fromSNbtSafely(String snbt) {
 		try {
 			return TextInst.fromSNbt(snbt);
-		} catch (CommandSyntaxException | NbtFormatException e) {}
+		} catch (CommandSyntaxException | NbtFormatException e) { // Ignored
+		}
 		return TextInst.of(snbt);
 	}
 	public static Component fromJsonSafely(String json) {
@@ -215,7 +220,8 @@ public class TextUtil {
 			Component output = TextInst.fromJson(json);
 			if (output != null)
 				return output;
-		} catch (JsonParseException e) {}
+		} catch (JsonParseException e) { // Ignored
+		}
 		return TextInst.of(json);
 	}
 	

@@ -1,17 +1,15 @@
 package com.luneruniverse.minecraft.mod.nbteditor.screens.configurable;
 
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVDrawableHelper;
+import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
+import net.minecraft.client.gui.components.AbstractSliderButton;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.network.chat.Component;
+import org.joml.Matrix3x2fStack;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVDrawableHelper;
-import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
-
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.gui.components.AbstractSliderButton;
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.network.chat.Component;
-import org.joml.Matrix3x2fStack;
 
 public class ConfigValueSlider<T extends Number> extends AbstractSliderButton implements ConfigValue<T, ConfigValueSlider<T>> {
 	
@@ -127,7 +125,7 @@ public class ConfigValueSlider<T extends Number> extends AbstractSliderButton im
 	
 	@Override
 	public ConfigValueSlider<T> clone(boolean defaults) {
-		return new ConfigValueSlider<T>(this.width, defaults ? defaultValue : actualValue, defaultValue, min, max, step, msg, caster, onChanged);
+		return new ConfigValueSlider<>(this.width, defaults ? defaultValue : actualValue, defaultValue, min, max, step, msg, caster, onChanged);
 	}
 	
 }

@@ -1,6 +1,26 @@
 package com.luneruniverse.minecraft.mod.nbteditor.screens.widgets;
 
-import java.awt.Point;
+import com.luneruniverse.minecraft.mod.nbteditor.NBTEditor;
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.*;
+import com.luneruniverse.minecraft.mod.nbteditor.screens.OverlaySupportingScreen;
+import com.luneruniverse.minecraft.mod.nbteditor.screens.Tickable;
+import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
+import com.luneruniverse.minecraft.mod.nbteditor.util.TextUtil;
+import com.mojang.brigadier.suggestion.Suggestions;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Util;
+import org.joml.Matrix3x2fStack;
+import org.lwjgl.glfw.GLFW;
+
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -11,34 +31,6 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
-import com.luneruniverse.minecraft.mod.nbteditor.NBTEditor;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.input.CharacterEvent;
-import net.minecraft.client.input.KeyEvent;
-import org.joml.Matrix3x2fStack;
-import org.lwjgl.glfw.GLFW;
-
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVDrawable;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVDrawableHelper;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVElement;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVTooltip;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.OverlaySupportingScreen;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.Tickable;
-import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
-import com.luneruniverse.minecraft.mod.nbteditor.util.TextUtil;
-import com.mojang.brigadier.suggestion.Suggestions;
-
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.narration.NarratableEntry;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.network.chat.Component;
-import net.minecraft.util.Util;
 
 public class MultiLineTextFieldWidget implements MVDrawable, MVElement, Tickable, NarratableEntry {
 	
@@ -65,9 +57,7 @@ public class MultiLineTextFieldWidget implements MVDrawable, MVElement, Tickable
 				regex = !regex;
 				btn.setMessage(TextInst.translatable("nbteditor.multi_line_text.regex." + (regex ? "on" : "off")));
 			}, new MVTooltip("nbteditor.multi_line_text.regex")));
-			addWidget(MVMisc.newButton(0, 40, 40, 20, TextInst.translatable("nbteditor.multi_line_text.find"), btn -> {
-				goToNext(NBTEditor.hasShiftDown(), true);
-			}));
+			addWidget(MVMisc.newButton(0, 40, 40, 20, TextInst.translatable("nbteditor.multi_line_text.find"), btn -> goToNext(NBTEditor.hasShiftDown(), true)));
 			addWidget(MVMisc.newButton(44, 40, 64, 20, TextInst.translatable("nbteditor.multi_line_text.replace"), btn -> {
 				if (goToNext(NBTEditor.hasShiftDown(), true))
 					replaceSel();
@@ -88,9 +78,7 @@ public class MultiLineTextFieldWidget implements MVDrawable, MVElement, Tickable
 				if (first)
 					cursor = prevCursor;
 			}));
-			addWidget(MVMisc.newButton(180, 40, 20, 20, TextInst.translatable("nbteditor.multi_line_text.x"), btn -> {
-				OverlaySupportingScreen.setOverlayStatic(null);
-			}));
+			addWidget(MVMisc.newButton(180, 40, 20, 20, TextInst.translatable("nbteditor.multi_line_text.x"), btn -> OverlaySupportingScreen.setOverlayStatic(null)));
 			
 			if (selStart != selEnd)
 				findValue = getSelectedText();

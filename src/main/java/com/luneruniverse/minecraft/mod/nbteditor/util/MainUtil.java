@@ -1,7 +1,40 @@
 package com.luneruniverse.minecraft.mod.nbteditor.util;
 
-import java.awt.Graphics2D;
-import java.awt.Image;
+import com.luneruniverse.minecraft.mod.nbteditor.NBTEditorClient;
+import com.luneruniverse.minecraft.mod.nbteditor.async.UpdateCheckerThread;
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.*;
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.nbt.manager.NBTManagers;
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.shaders.MVShader;
+import com.luneruniverse.minecraft.mod.nbteditor.screens.widgets.HSVColorAreaRenderState;
+import com.mojang.datafixers.DSL.TypeReference;
+import com.mojang.serialization.Dynamic;
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.render.TextureSetup;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.NumericTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ServerboundSetCreativeModeSlotPacket;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import org.joml.Matrix3x2f;
+import org.joml.Matrix3x2fStack;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -13,52 +46,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.zip.ZipException;
-
-import com.luneruniverse.minecraft.mod.nbteditor.NBTEditorClient;
-import com.luneruniverse.minecraft.mod.nbteditor.async.UpdateCheckerThread;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.ActionResult;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.IdentifierInst;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVComponentType;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVDrawableHelper;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVGlStateManager;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMatrix4f;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVRegistry;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.nbt.manager.NBTManagers;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.shaders.MVShader;
-import com.mojang.datafixers.DSL.TypeReference;
-import com.mojang.serialization.Dynamic;
-
-import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.components.EditBox;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.NumericTag;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.network.protocol.game.ServerboundSetCreativeModeSlotPacket;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.DyeColor;
-import net.minecraft.ChatFormatting;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.resources.Identifier;
-import org.joml.Matrix3x2fStack;
 
 public class MainUtil {
 	
@@ -67,7 +57,7 @@ public class MainUtil {
 	// Same as ClientPlayerInteractionManager#clickCreativeSlot, but without a feature flag check
 	// Also includes survival bypass
 	/**
-	 * @param item
+	 * @param item the item stack to place
 	 * @param slot Format: container
 	 */
 	public static void clickCreativeStack(ItemStack item, int slot) {
@@ -78,8 +68,10 @@ public class MainUtil {
 		if (NBTEditorClient.SERVER_CONN.isEditingAllowed() && !item.isEmpty())
 			MVMisc.sendC2SPacket(new ServerboundSetCreativeModeSlotPacket(-1, item.copy()));
 	}
-	
+
 	public static void saveItem(InteractionHand hand, ItemStack item) {
+		if (client.player == null)
+			return;
 		client.player.setItemInHand(hand, item.copy());
 		clickCreativeStack(item, hand == InteractionHand.OFF_HAND ? SlotUtil.createOffHandInContainer() :
 			SlotUtil.createHotbarInContainer(client.player.getInventory().selected));
@@ -97,14 +89,18 @@ public class MainUtil {
 	
 	/**
 	 * @param slot Format: inv
-	 * @param item
+	 * @param item the item stack to save
 	 */
 	public static void saveItem(int slot, ItemStack item) {
+		if (client.player == null)
+			return;
 		client.player.getInventory().setItem(slot, item.copy());
 		clickCreativeStack(item, SlotUtil.invToContainer(slot));
 	}
-	
+
 	public static void get(ItemStack item, boolean dropIfNoSpace) {
+		if (client.player == null)
+			return;
 		Inventory inv = client.player.getInventory();
 		item = item.copy();
 		
@@ -134,7 +130,8 @@ public class MainUtil {
 	}
 	public static void getWithMessage(ItemStack item) {
 		get(item, true);
-		client.player.sendSystemMessage(TextInst.translatable("nbteditor.get.item").append(item.getDisplayName()));
+		if (client.player != null)
+			client.player.sendSystemMessage(TextInst.translatable("nbteditor.get.item").append(item.getDisplayName()));
 	}
 	
 	
@@ -183,16 +180,15 @@ public class MainUtil {
 		
 		// Generate lines, maximizing the number of parts per line
 		List<String> lines = new ArrayList<>();
-		String line = "";
+		StringBuilder line = new StringBuilder();
 		int i = 0;
 		for (String part : parts) {
-			String partAddition = (!line.isEmpty() && spaces.contains(i) ? " " : "") + part;
+			String partAddition = (line.length() > 0 && spaces.contains(i) ? " " : "") + part;
 			if (renderer.width(line + partAddition) > maxWidth) {
-				if (!line.isEmpty()) {
-					lines.add(line);
-					line = "";
+				if (line.length() > 0) {
+					lines.add(line.toString());
 				}
-				
+
 				if (renderer.width(part) > maxWidth) {
 					while (true) {
 						int numChars = 1;
@@ -202,28 +198,31 @@ public class MainUtil {
 						lines.add(part.substring(0, numChars));
 						part = part.substring(numChars);
 						if (renderer.width(part) < maxWidth) {
-							line = part;
+							line.setLength(0);
+							line.append(part);
 							break;
 						}
 					}
-				} else
-					line = part;
+				} else {
+					line.setLength(0);
+					line.append(part);
+				}
 			} else
-				line += partAddition;
+				line.append(partAddition);
 			i++;
 		}
-		if (!line.isEmpty())
-			lines.add(line);
-		
-		
+		if (line.length() > 0)
+			lines.add(line.toString());
+
+
 		// Draw the lines
 		for (i = 0; i < lines.size(); i++) {
-			line = lines.get(i);
+			String drawLine = lines.get(i);
 			int offsetY = i * renderer.lineHeight + (centerVertical ? -renderer.lineHeight * lines.size() / 2 : 0);
 			if (centerHorizontal)
-				MVDrawableHelper.drawCenteredTextWithShadow(matrices, renderer, TextInst.of(line), x, y + offsetY, color);
+				MVDrawableHelper.drawCenteredTextWithShadow(matrices, renderer, TextInst.of(drawLine), x, y + offsetY, color);
 			else
-				MVDrawableHelper.drawTextWithShadow(matrices, renderer, TextInst.of(line), x, y + offsetY, color);
+				MVDrawableHelper.drawTextWithShadow(matrices, renderer, TextInst.of(drawLine), x, y + offsetY, color);
 		}
 	}
 	
@@ -276,7 +275,8 @@ public class MainUtil {
 					Component text = TextInst.fromMinecraft(textNbt);
 					if (text != null)
 						return text;
-				} catch (IllegalArgumentException e) {}
+				} catch (IllegalArgumentException e) { // Ignored
+				}
 			}
 		}
 		return defaultName.get();
@@ -284,42 +284,25 @@ public class MainUtil {
 	
 	
 	public static DyeColor getDyeColor(ChatFormatting color) {
-		switch (color) {
-			case AQUA:
-				return DyeColor.LIGHT_BLUE;
-			case BLACK:
-				return DyeColor.BLACK;
-			case BLUE:
-				return DyeColor.BLUE;
-			case DARK_AQUA:
-				return DyeColor.CYAN;
-			case DARK_BLUE:
-				return DyeColor.BLUE;
-			case DARK_GRAY:
-				return DyeColor.GRAY;
-			case DARK_GREEN:
-				return DyeColor.GREEN;
-			case DARK_PURPLE:
-				return DyeColor.PURPLE;
-			case DARK_RED:
-				return DyeColor.RED;
-			case GOLD:
-				return DyeColor.ORANGE;
-			case GRAY:
-				return DyeColor.LIGHT_GRAY;
-			case GREEN:
-				return DyeColor.LIME;
-			case LIGHT_PURPLE:
-				return DyeColor.PINK;
-			case RED:
-				return DyeColor.RED;
-			case WHITE:
-				return DyeColor.WHITE;
-			case YELLOW:
-				return DyeColor.YELLOW;
-			default:
-				return DyeColor.BROWN;
-		}
+        return switch (color) {
+            case AQUA -> DyeColor.LIGHT_BLUE;
+            case BLACK -> DyeColor.BLACK;
+            case BLUE -> DyeColor.BLUE;
+            case DARK_AQUA -> DyeColor.CYAN;
+            case DARK_BLUE -> DyeColor.BLUE;
+            case DARK_GRAY -> DyeColor.GRAY;
+            case DARK_GREEN -> DyeColor.GREEN;
+            case DARK_PURPLE -> DyeColor.PURPLE;
+            case DARK_RED -> DyeColor.RED;
+            case GOLD -> DyeColor.ORANGE;
+            case GRAY -> DyeColor.LIGHT_GRAY;
+            case GREEN -> DyeColor.LIME;
+            case LIGHT_PURPLE -> DyeColor.PINK;
+            case RED -> DyeColor.RED;
+            case WHITE -> DyeColor.WHITE;
+            case YELLOW -> DyeColor.YELLOW;
+            default -> DyeColor.BROWN;
+        };
 	}
 	
 	
@@ -354,16 +337,14 @@ public class MainUtil {
 	
 	@SuppressWarnings("unchecked")
 	public static <T> Event<T> newEvent(Class<T> clazz) {
-		return EventFactory.createArrayBacked(clazz, listeners -> {
-			return (T) Proxy.newProxyInstance(MainUtil.class.getClassLoader(), new Class<?>[] {clazz}, (obj, method, args) -> {
-				for (T listener : listeners) {
-					ActionResult result = (ActionResult) method.invoke(listener, args);
-					if (result != ActionResult.PASS)
-						return result;
-				}
-				return ActionResult.PASS;
-			});
-		});
+		return EventFactory.createArrayBacked(clazz, listeners -> (T) Proxy.newProxyInstance(MainUtil.class.getClassLoader(), new Class<?>[] {clazz}, (_, method, args) -> {
+            for (T listener : listeners) {
+                ActionResult result = (ActionResult) method.invoke(listener, args);
+                if (result != ActionResult.PASS)
+                    return result;
+            }
+            return ActionResult.PASS;
+        }));
 	}
 	
 	
@@ -420,13 +401,18 @@ public class MainUtil {
 	
 	public static Predicate<String> intPredicate(Supplier<Integer> min, Supplier<Integer> max, boolean allowEmpty) {
 		return str -> {
-			if (str.isEmpty())
-				return allowEmpty;
-			if (str.equals("+"))
-				return allowEmpty && (max == null || max.get() >= 0);
-			if (str.equals("-"))
-				return allowEmpty && (min == null || min.get() <= 0);
-			try {
+            switch (str) {
+                case "" -> {
+                    return allowEmpty;
+                }
+                case "+" -> {
+                    return allowEmpty && (max == null || max.get() >= 0);
+                }
+                case "-" -> {
+                    return allowEmpty && (min == null || min.get() <= 0);
+                }
+            }
+            try {
 				int value = Integer.parseInt(str);
 				return (min == null || min.get() <= value) && (max == null || value <= max.get());
 			} catch (NumberFormatException e) {
@@ -437,10 +423,7 @@ public class MainUtil {
 	public static Predicate<String> intPredicate(Integer min, Integer max, boolean allowEmpty) {
 		return intPredicate(() -> min, () -> max, allowEmpty);
 	}
-	public static Predicate<String> intPredicate() {
-		return intPredicate((Supplier<Integer>) null, null, true);
-	}
-	
+
 	public static Integer parseOptionalInt(String str) {
 		try {
 			return Integer.parseInt(str);
@@ -456,29 +439,16 @@ public class MainUtil {
 	}
 	
 	
-	public static void fillShader(Matrix3x2fStack matrices, MVShader shader, Consumer<VertexConsumer> data, int x, int y, int width, int height) {
-		int x1 = x;
-		int y1 = y;
-		int x2 = x + width;
-		int y2 = y + height;
-		
-		VertexConsumer vertexConsumer = MVMisc.beginDrawingShader(matrices, shader);
-		
-		data.accept(vertexConsumer);
-		MVMisc.nextVertex(vertexConsumer);
-		
-		data.accept(vertexConsumer);
-		MVMisc.nextVertex(vertexConsumer);
-		
-		data.accept(vertexConsumer);
-		MVMisc.nextVertex(vertexConsumer);
-		
-		data.accept(vertexConsumer);
-		MVMisc.nextVertex(vertexConsumer);
-		
-		MVGlStateManager._disableDepthTest();
-		MVMisc.endDrawingShader(matrices, vertexConsumer);
-		MVGlStateManager._enableDepthTest();
+	public static void fillShader(Matrix3x2fStack matrices, MVShader shader, int hueValue, int x, int y, int width, int height) {
+		GuiGraphicsExtractor context = MVDrawableHelper.getDrawContext(matrices);
+		context.guiRenderState.addGuiElement(new HSVColorAreaRenderState(
+				shader.getPipeline(),
+				TextureSetup.noTexture(),
+				new Matrix3x2f(matrices),
+				x, y, x + width, y + height,
+				hueValue,
+				context.scissorStack.peek()
+		));
 	}
 	
 	
@@ -492,7 +462,7 @@ public class MainUtil {
 	 */
 	public static <T extends Tag> T updateDynamic(TypeReference typeRef, T nbt, Tag dataVersionTag, int defaultOldVersion) {
 		int dataVersion = defaultOldVersion;
-		if (dataVersionTag != null && dataVersionTag instanceof NumericTag num)
+		if (dataVersionTag instanceof NumericTag num)
 			dataVersion = num.intValue();
 		else if (dataVersion == -1)
 			return nbt;

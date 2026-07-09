@@ -1,12 +1,5 @@
 package com.luneruniverse.minecraft.mod.nbteditor.multiversion;
 
-import java.lang.invoke.MethodType;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -14,22 +7,24 @@ import com.google.gson.JsonSyntaxException;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.JsonOps;
-
+import net.minecraft.core.Holder;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.TagParser;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.server.dialog.Dialog;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.TagParser;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.RegistryOps;
-import net.minecraft.core.Holder;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStackTemplate;
+
+import java.lang.invoke.MethodType;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class MVTextEvents {
 	
@@ -42,9 +37,7 @@ public class MVTextEvents {
 			}
 		};
 		private static final Function<String, Optional<String>> parseStr = Optional::of;
-		private static final Function<String, Optional<String>> parseCmd = valueStr -> {
-			return valueStr.chars().allMatch(c -> MVMisc.isValidChar((char) c)) ? Optional.of(valueStr) : Optional.empty();
-		};
+		private static final Function<String, Optional<String>> parseCmd = valueStr -> valueStr.chars().allMatch(c -> MVMisc.isValidChar((char) c)) ? Optional.of(valueStr) : Optional.empty();
 		private static final Function<String, Optional<Integer>> parsePage = valueStr -> {
 			try {
 				int page = Integer.parseInt(valueStr);
@@ -162,7 +155,7 @@ public class MVTextEvents {
 				Reflection.getOptionalMethod(HoverEvent.class, "method_10892", MethodType.methodType(net.minecraft.network.chat.HoverEvent.Action.class));
 		public static HoverAction<?> getAction(HoverEvent event) {
 			return switch (Version.<net.minecraft.network.chat.HoverEvent.Action>newSwitch()
-					.range("1.21.5", null, () -> event.action())
+					.range("1.21.5", null, event::action)
 					.range(null, "1.21.4", () -> HoverEvent_getAction.get().invoke(event))
 					.get()) {
 				case SHOW_TEXT -> SHOW_TEXT;

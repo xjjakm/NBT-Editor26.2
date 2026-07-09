@@ -1,8 +1,5 @@
 package com.luneruniverse.minecraft.mod.nbteditor.commands.nbt;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.luneruniverse.minecraft.mod.nbteditor.commands.ClientCommandGroup;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.FabricClientCommandSource;
 import com.luneruniverse.minecraft.mod.nbteditor.nbtreferences.NBTReference;
@@ -12,6 +9,9 @@ import com.luneruniverse.minecraft.mod.nbteditor.screens.NBTEditorScreen;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class NBTCommand extends ClientCommandGroup {
 	
@@ -40,7 +40,7 @@ public class NBTCommand extends ClientCommandGroup {
 		super.register(builder, path);
 		builder.executes(context -> {
 			NBTReference.getReference(NBTReferenceFilter.ANY, ConfigScreen.isAirEditable(),
-					ref -> MainUtil.client.setScreen(new NBTEditorScreen<>(ref)));
+					ref -> MainUtil.client.gui.setScreen(new NBTEditorScreen<>(ref)));
 			return Command.SINGLE_SUCCESS;
 		});
 	}

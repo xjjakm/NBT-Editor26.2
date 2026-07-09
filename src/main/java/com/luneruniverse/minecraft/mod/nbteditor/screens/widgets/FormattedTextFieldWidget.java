@@ -1,44 +1,29 @@
 package com.luneruniverse.minecraft.mod.nbteditor.screens.widgets;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
-
 import com.luneruniverse.minecraft.mod.nbteditor.NBTEditor;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FontDescription;
-import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.network.chat.Style;
-import org.joml.Matrix3x2fStack;
-import org.lwjgl.glfw.GLFW;
-
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.EditableText;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.IdentifierInst;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVDrawableHelper;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVTextEvents;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVTooltip;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.*;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.ConfigScreen;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.OverlaySupportingScreen;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.ConfigValueDropdown;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
 import com.luneruniverse.minecraft.mod.nbteditor.util.StyleUtil;
 import com.luneruniverse.minecraft.mod.nbteditor.util.TextUtil;
-import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.network.chat.*;
 import net.minecraft.resources.Identifier;
+import org.joml.Matrix3x2fStack;
+import org.lwjgl.glfw.GLFW;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 
 public class FormattedTextFieldWidget extends GroupWidget {
 	
@@ -137,19 +122,17 @@ public class FormattedTextFieldWidget extends GroupWidget {
 						.name(TextInst.translatable("nbteditor.formatted_text.hover_event_value"));
 				hoverValueField.setMaxLength(Integer.MAX_VALUE);
 				hoverValueField.setValue(hoverValue);
-				hoverValueField.setResponder(str -> updateOk());
+				hoverValueField.setResponder(_ -> updateOk());
 				
-				ok = addWidget(MVMisc.newButton(0, 0, 150, 20, TextInst.translatable("nbteditor.ok"), btn -> {
-					onDone.onEventChange(
-							clickActionDropdown.getValidValue() == ClickAction.NONE ? null :
-								clickActionDropdown.getValidValue().value.newEventParse(clickValueField.getValue()).get(),
-							hoverActionDropdown.getValidValue() == HoverAction.NONE ? null :
-								hoverActionDropdown.getValidValue().value.newEventParse(hoverValueField.getValue()).get());
-					OverlaySupportingScreen.setOverlayStatic(null);
-				}));
-				cancel = addWidget(MVMisc.newButton(0, 0, 150, 20, TextInst.translatable("nbteditor.cancel"), btn -> {
-					OverlaySupportingScreen.setOverlayStatic(null);
-				}));
+				ok = addWidget(MVMisc.newButton(0, 0, 150, 20, TextInst.translatable("nbteditor.ok"), _ -> {
+				onDone.onEventChange(
+						clickActionDropdown.getValidValue() == ClickAction.NONE ? null :
+							clickActionDropdown.getValidValue().value.newEventParse(clickValueField.getValue()).orElse(null),
+						hoverActionDropdown.getValidValue() == HoverAction.NONE ? null :
+							hoverActionDropdown.getValidValue().value.newEventParse(hoverValueField.getValue()).orElse(null));
+				OverlaySupportingScreen.setOverlayStatic(null);
+			}));
+			cancel = addWidget(MVMisc.newButton(0, 0, 150, 20, TextInst.translatable("nbteditor.cancel"), _ -> OverlaySupportingScreen.setOverlayStatic(null)));
 				
 				addDrawable(hoverActionField);
 				addDrawable(clickActionField);
@@ -217,7 +200,7 @@ public class FormattedTextFieldWidget extends GroupWidget {
 			prev.setTextChangeListener(onChange);
 			prev.ignoreNextSetText = true;
 			MultiLineTextFieldWidget.create(prev, x, y, width, height, text.getString(),
-					str -> prev.text, newLines, str -> prev.onChange.accept(prev.text));
+				_ -> prev.text, newLines, _ -> prev.onChange.accept(prev.text));
 			prev.setFormattedText(text);
 			return prev;
 		}
@@ -244,15 +227,14 @@ public class FormattedTextFieldWidget extends GroupWidget {
 			this.undo.add(text);
 			undoPos = 0;
 			genStyles(text, base, 0);
-			setFormatter(str -> this.text);
-			setChangeListener(str -> this.onChange.accept(this.text));
-			onEdit("", 0, 0);
+		setFormatter(_ -> this.text);
+		setChangeListener(_ -> this.onChange.accept(this.text));
+		onEdit("", 0, 0);
 			generateLines();
 		}
 		
-		public InternalTextFieldWidget setTextChangeListener(Consumer<Component> onChange) {
+		public void setTextChangeListener(Consumer<Component> onChange) {
 			this.onChange = onChange;
-			return this;
 		}
 		
 		private void genStyles(Component text, Style parent, int index) {
@@ -366,7 +348,7 @@ public class FormattedTextFieldWidget extends GroupWidget {
 		
 		private void applyColor(ChatFormatting color, boolean shadow) {
 			if (shadow) {
-				int shadowColor = (MVMisc.scaleRgb(color.getColor(), 0.25) | 0xFF000000);
+				int shadowColor = (MVMisc.scaleRgb(MVMisc.getChatFormattingColor(color), 0.25) | 0xFF000000);
 				applyStyleChange(style -> style.withShadowColor(shadowColor), true);
 			} else
 				applyFormatting(color);
@@ -445,7 +427,7 @@ public class FormattedTextFieldWidget extends GroupWidget {
 					StringInput.builder()
 							.withDefault(getFontString(initialStyle))
 							.withValidator(font -> font.isEmpty() || IdentifierInst.isValid(font))
-							.withSuggestions((str, cursor) -> {
+							.withSuggestions((str, _) -> {
 								SuggestionsBuilder builder = new SuggestionsBuilder(str, 0);
 								for (Identifier font : MainUtil.client.fontManager.fontSets.keySet()) {
 									String fontStr = font.toString();
@@ -521,7 +503,7 @@ public class FormattedTextFieldWidget extends GroupWidget {
 		@Override
 		protected void onEdit(String insertedText, int pos, int overwrittenLen) {
 			while (undoPos > 0) {
-				undo.remove(0);
+				undo.removeFirst();
 				undoPos--;
 			}
 			
@@ -556,24 +538,24 @@ public class FormattedTextFieldWidget extends GroupWidget {
 			
 			String afterEdit = new StringBuilder(getText()).replace(pos, pos + overwrittenLen, insertedText).toString();
 			EditableText text = TextInst.literal("");
-			String part = "";
-			Style style = !styles.isEmpty() && styles.get(0) != null ? styles.get(0) : base;
+			StringBuilder part = new StringBuilder();
+			Style style = !styles.isEmpty() && styles.getFirst() != null ? styles.getFirst() : base;
 			for (int i = 0; i < afterEdit.length(); i++) {
 				Style newStyle = (i == 0 || i >= styles.size() ? null : styles.get(i));
 				if (newStyle != null) {
 					if (newStyle.equals(style))
 						styles.set(i, null);
 					else {
-						text.append(TextInst.literal(part).setStyle(style));
-						part = "";
+						text.append(TextInst.literal(part.toString()).setStyle(style));
+						part.setLength(0);
 						style = newStyle;
 					}
 				}
-				part += afterEdit.charAt(i);
+				part.append(afterEdit.charAt(i));
 			}
-			if (!part.isEmpty())
-				text.append(TextInst.literal(part).setStyle(style));
-			undo.add(0, text);
+			if (part.length() > 0)
+				text.append(TextInst.literal(part.toString()).setStyle(style));
+			undo.addFirst(text);
 			this.text = text;
 			
 			while (styles.size() > afterEdit.length())
@@ -601,10 +583,10 @@ public class FormattedTextFieldWidget extends GroupWidget {
 		@Override
 		protected void onUndoDiscard() {
 			while (undoPos > 0) {
-				undo.remove(0);
+				undo.removeFirst();
 				undoPos--;
 			}
-			undo.remove(0);
+			undo.removeFirst();
 		}
 		
 		@Override
@@ -717,9 +699,9 @@ public class FormattedTextFieldWidget extends GroupWidget {
 		if (width < 16 * 20 + (ConfigScreen.isHideFormatButtons() ? 0 : 20 + 4 + 5 * 20 + (4 + 20) * 2)) {
 			colors = addElement(new ButtonDropdownWidget(x, y, 20, 20, TextInst.literal("⬛").formatted(ChatFormatting.AQUA), 20, 20));
 			for (ChatFormatting formatting : ChatFormatting.values()) {
-				if (!formatting.isColor())
+				if (!MVMisc.isChatFormattingColor(formatting))
 					break;
-				colors.addButton(TextInst.literal("⬛").formatted(formatting), btn -> {
+				colors.addButton(TextInst.literal("⬛").formatted(formatting), _ -> {
 					field.applyColor(formatting, hasShadowKeyDown());
 					colors.setOpen(false);
 				}, createColorButtonTooltip(formatting));
@@ -729,10 +711,10 @@ public class FormattedTextFieldWidget extends GroupWidget {
 			colors = null;
 			int i = 0;
 			for (ChatFormatting formatting : ChatFormatting.values()) {
-				if (!formatting.isColor())
+				if (!MVMisc.isChatFormattingColor(formatting))
 					break;
 				addWidget(MVMisc.newButton(x + i * 20, y, 20, 20, TextInst.literal("⬛").formatted(formatting),
-						btn -> field.applyColor(formatting, hasShadowKeyDown()), createColorButtonTooltip(formatting)));
+						_ -> field.applyColor(formatting, hasShadowKeyDown()), createColorButtonTooltip(formatting)));
 				i++;
 			}
 		}
@@ -748,43 +730,43 @@ public class FormattedTextFieldWidget extends GroupWidget {
 				if (formatting == ChatFormatting.RESET) {
 					btnText = TextInst.of("");
 					if (ConfigScreen.isKeybindsHidden())
-						btnTooltip = new MVTooltip(TextInst.of(formatting.getName()));
+						btnTooltip = new MVTooltip(TextInst.of(MVMisc.getChatFormattingName(formatting)));
 					else {
 						btnTooltip = new MVTooltip(
-								TextInst.of(formatting.getName()),
+								TextInst.of(MVMisc.getChatFormattingName(formatting)),
 								TextInst.translatable("nbteditor.keybind.formatted_text.reset"));
 					}
 				} else {
 					btnText = TextInst.literal(formatting.name().substring(0, 1)).formatted(formatting);
-					btnTooltip = new MVTooltip(TextInst.of(formatting.getName()));
+					btnTooltip = new MVTooltip(TextInst.of(MVMisc.getChatFormattingName(formatting)));
 				}
 				addWidget(MVMisc.newButton(
 						afterColorsX + 24 + i * 20 + (formatting == ChatFormatting.RESET ? 4 + 20 * 3 + 4 : 0), y, 20, 20,
-						btnText, btn -> field.applyFormatting(formatting), btnTooltip));
+						btnText, _ -> field.applyFormatting(formatting), btnTooltip));
 				i++;
 			}
 			
 			addWidget(MVMisc.newButton(afterColorsX, y, 20, 20,
 					TextInst.literal("⬛").setStyle(Style.EMPTY.withColor(0x9999C0).applyFormat(ChatFormatting.ITALIC)),
-					btn -> field.showCustomColor(hasShadowKeyDown()),
+					_ -> field.showCustomColor(hasShadowKeyDown()),
 					createFormatButtonTooltip("custom_color", true)));
 			
 			addWidget(MVMisc.newButton(afterColorsX + 24 + 5 * 20 + 4, y, 20, 20,
 					TextInst.literal("E"),
-					btn -> field.showEvents(),
+					_ -> field.showEvents(),
 					createFormatButtonTooltip("events", false)));
 			addWidget(MVMisc.newButton(afterColorsX + 24 + 5 * 20 + 4 + 20, y, 20, 20,
 					TextInst.literal("I"),
-					btn -> field.showInsertion(),
+					_ -> field.showInsertion(),
 					createFormatButtonTooltip("insertion", false)));
 			font = addWidget(MVMisc.newButton(afterColorsX + 24 + 5 * 20 + 4 + 20 * 2, y, 20, 20,
 					TextInst.literal("F"), // Gets replaced before rendering
-					btn -> field.showFont(),
+					_ -> field.showFont(),
 					createFormatButtonTooltip("font", false)));
 		}
 	}
 	private MVTooltip createColorButtonTooltip(ChatFormatting color) {
-		Component name = TextInst.of(color.getName());
+		Component name = TextInst.of(MVMisc.getChatFormattingName(color));
 		if (ConfigScreen.isKeybindsHidden() || !StyleUtil.SHADOW_COLOR_EXISTS)
 			return new MVTooltip(name);
 		return new MVTooltip(name, TextInst.translatable("nbteditor.keybind.formatted_text.shadow"));
@@ -799,25 +781,20 @@ public class FormattedTextFieldWidget extends GroupWidget {
 		return new MVTooltip(nameKey, keybindKey);
 	}
 	
-	public FormattedTextFieldWidget setChangeListener(Consumer<Component> onChange) {
+	public void setChangeListener(Consumer<Component> onChange) {
 		field.setTextChangeListener(onChange);
-		return this;
 	}
-	public FormattedTextFieldWidget setMaxLines(int maxLines) {
+	public void setMaxLines(int maxLines) {
 		field.setMaxLines(maxLines);
-		return this;
 	}
-	public FormattedTextFieldWidget setBackgroundColor(int bgColor) {
+	public void setBackgroundColor(int bgColor) {
 		field.setBackgroundColor(bgColor);
-		return this;
 	}
-	public FormattedTextFieldWidget setCursorColor(int cursorColor) {
+	public void setCursorColor(int cursorColor) {
 		field.setCursorColor(cursorColor);
-		return this;
 	}
-	public FormattedTextFieldWidget setSelectionColor(int selColor) {
+	public void setSelectionColor(int selColor) {
 		field.setSelectionColor(selColor);
-		return this;
 	}
 	public FormattedTextFieldWidget setShadow(boolean shadow) {
 		field.setShadow(shadow);
@@ -827,12 +804,8 @@ public class FormattedTextFieldWidget extends GroupWidget {
 		field.setOverscroll(overscroll);
 		return this;
 	}
-	
-	public FormattedTextFieldWidget suggest(Screen screen, BiFunction<String, Integer, CompletableFuture<Suggestions>> suggestions) {
-		field.suggest(screen, suggestions);
-		return this;
-	}
-	
+
+
 	public int getX() {
 		return x;
 	}
@@ -855,11 +828,8 @@ public class FormattedTextFieldWidget extends GroupWidget {
 	public Component getText() {
 		return field.getFormattedText();
 	}
-	
-	public List<Component> getTextLines() {
-		return TextUtil.splitText(getText());
-	}
-	
+
+
 	@Override
 	public void extractRenderState(Matrix3x2fStack matrices, int mouseX, int mouseY, float delta) {
 		setFocused(isMultiFocused() ? field : null);

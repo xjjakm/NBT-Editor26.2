@@ -1,11 +1,5 @@
 package com.luneruniverse.minecraft.mod.nbteditor.util;
 
-import java.text.NumberFormat;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
-
 import com.luneruniverse.minecraft.mod.nbteditor.misc.MixinLink;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.EditableText;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
@@ -14,16 +8,13 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-
-import net.minecraft.nbt.ByteTag;
-import net.minecraft.nbt.ByteArrayTag;
-import net.minecraft.nbt.IntTag;
-import net.minecraft.nbt.IntArrayTag;
-import net.minecraft.nbt.LongTag;
-import net.minecraft.nbt.LongArrayTag;
-import net.minecraft.nbt.TagType;
-import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.*;
+import net.minecraft.network.chat.Component;
+
+import java.text.NumberFormat;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 public class NbtFormatter {
 

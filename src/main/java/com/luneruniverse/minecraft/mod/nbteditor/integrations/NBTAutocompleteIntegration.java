@@ -1,16 +1,9 @@
 package com.luneruniverse.minecraft.mod.nbteditor.integrations;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
-
 import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalBlock;
 import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalEntity;
 import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalItem;
 import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalNBT;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.DynamicRegistryManagerHolder;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.nbt.manager.NBTManagers;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
@@ -19,14 +12,20 @@ import com.mojang.brigadier.suggestion.Suggestion;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mt1006.nbt_ac.autocomplete.NbtSuggestionManager;
-
 import net.minecraft.commands.arguments.item.ItemParser;
 import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.Identifier;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class NBTAutocompleteIntegration extends Integration {
 	
@@ -156,7 +155,7 @@ public class NBTAutocompleteIntegration extends Integration {
 						}
 						return suggestion;
 					})
-					.filter(suggestion -> suggestion != null)
+					.filter(Objects::nonNull)
 					.collect(Collectors.toList());
 			return new Suggestions(shiftRange(suggestions.getRange(), -fieldStartFinal), shiftedSuggestions);
 		});
@@ -171,10 +170,8 @@ public class NBTAutocompleteIntegration extends Integration {
 			name = name.substring("item/".length());
 			int shift = name.length();
 			SuggestionsBuilder builder = new SuggestionsBuilder(name + tag, 0);
-			return new ItemParser((MainUtil.client.getConnection() == null ? VanillaRegistries.createLookup() : MainUtil.client.getConnection().registryAccess())).fillSuggestions(builder).thenApply(suggestions -> {
-				return new Suggestions(shiftRange(suggestions.getRange(), -shift), suggestions.getList().stream()
-						.map(suggestion -> shiftSuggestion(suggestion, -shift)).collect(Collectors.toList()));
-			});
+			return new ItemParser((MainUtil.client.getConnection() == null ? VanillaRegistries.createLookup() : MainUtil.client.getConnection().registryAccess())).fillSuggestions(builder).thenApply(suggestions -> new Suggestions(shiftRange(suggestions.getRange(), -shift), suggestions.getList().stream()
+                    .map(suggestion -> shiftSuggestion(suggestion, -shift)).collect(Collectors.toList())));
 		}
 		return NbtSuggestionManager.loadFromName(name, tag, new SuggestionsBuilder(tag, 0), false);
 	}

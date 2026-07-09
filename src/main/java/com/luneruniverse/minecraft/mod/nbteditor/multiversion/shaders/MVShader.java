@@ -1,12 +1,12 @@
 package com.luneruniverse.minecraft.mod.nbteditor.multiversion.shaders;
 
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.vertex.VertexFormat;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
-
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
-
-import net.minecraft.client.renderer.rendertype.RenderType;
 
 public abstract class MVShader {
 	
@@ -59,13 +59,7 @@ public abstract class MVShader {
 		public MVDrawMode getDrawMode() {
 			return drawMode;
 		}
-		public int getExpectedBufferSize() {
-			return expectedBufferSize;
-		}
-		public boolean isAffectsOutline() {
-			return affectsOutline;
-		}
-		
+
 		public List<Object> getSnippets() {
 			return snippets;
 		}
@@ -81,6 +75,8 @@ public abstract class MVShader {
 		
 	}
 	
-	public abstract RenderType getLayer();
+	public abstract RenderPipeline getPipeline();
 	
+	public abstract VertexFormat getFormat();
+
 }

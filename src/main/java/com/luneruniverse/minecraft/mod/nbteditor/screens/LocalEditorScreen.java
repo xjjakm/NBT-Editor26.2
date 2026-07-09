@@ -1,23 +1,8 @@
 package com.luneruniverse.minecraft.mod.nbteditor.screens;
 
-import java.lang.invoke.MethodType;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.input.KeyEvent;
-import org.joml.Matrix3x2fStack;
-import org.lwjgl.glfw.GLFW;
-
 import com.luneruniverse.minecraft.mod.nbteditor.commands.get.GetLostItemCommand;
 import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalNBT;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVDrawableHelper;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVTooltip;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Reflection;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.*;
 import com.luneruniverse.minecraft.mod.nbteditor.nbtreferences.NBTReference;
 import com.luneruniverse.minecraft.mod.nbteditor.nbtreferences.itemreferences.ItemReference;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.factories.LocalFactoryScreen;
@@ -26,11 +11,18 @@ import com.luneruniverse.minecraft.mod.nbteditor.screens.widgets.AlertWidget;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.widgets.NamedTextFieldWidget;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.components.Button;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+import org.joml.Matrix3x2fStack;
+import org.lwjgl.glfw.GLFW;
+
+import java.lang.invoke.MethodType;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static com.luneruniverse.minecraft.mod.nbteditor.NBTEditor.*;
 
@@ -91,9 +83,7 @@ public abstract class LocalEditorScreen<L extends LocalNBT> extends OverlaySuppo
 		addRenderableWidget(name);
 		
 		if (isSaveRequried()) {
-			saveBtn = addRenderableWidget(MVMisc.newButton(16 + (32 + 8) * 2 + 100 + 8, 16 + 6, 100, 20, TextInst.translatable("nbteditor.editor.save"), btn -> {
-				save();
-			}));
+			saveBtn = addRenderableWidget(MVMisc.newButton(16 + (32 + 8) * 2 + 100 + 8, 16 + 6, 100, 20, TextInst.translatable("nbteditor.editor.save"), _ -> save()));
 			saveBtn.active = !saved;
 		}
 		
@@ -101,7 +91,7 @@ public abstract class LocalEditorScreen<L extends LocalNBT> extends OverlaySuppo
 		if (link != null) {
 			addRenderableWidget(MVMisc.newTexturedButton(width - 36, 22, 20, 20, 20,
 					LocalFactoryScreen.FACTORY_ICON,
-					btn -> closeSafely(() -> minecraft.setScreen(link.factory().apply(ItemReference.toItemStackRef(ref)))),
+					_ -> closeSafely(() -> minecraft.gui.setScreen(link.factory().apply(ItemReference.toItemStackRef(ref)))),
 					new MVTooltip(link.langName())));
 		}
 		
@@ -187,9 +177,7 @@ public abstract class LocalEditorScreen<L extends LocalNBT> extends OverlaySuppo
 			savedLocalNBT = LocalNBT.copy(localNBT);
 			saveBtn.setMessage(TextInst.translatable("nbteditor.editor.saving"));
 			setSaved(true);
-			ref.saveLocalNBT(savedLocalNBT, () -> {
-				saveBtn.setMessage(TextInst.translatable("nbteditor.editor.save"));
-			});
+			ref.saveLocalNBT(savedLocalNBT, () -> saveBtn.setMessage(TextInst.translatable("nbteditor.editor.save")));
 		} else {
 			localNBT.toItem(false).ifPresentOrElse(item -> {
 				savedLocalNBT = LocalNBT.copy(localNBT);
@@ -215,7 +203,7 @@ public abstract class LocalEditorScreen<L extends LocalNBT> extends OverlaySuppo
 		if (saved)
 			onClose.run();
 		else {
-			minecraft.setScreen(new FancyConfirmScreen(value -> {
+			minecraft.gui.setScreen(new FancyConfirmScreen(value -> {
 				if (!value || save())
 					onClose.run();
 			}, TextInst.translatable("nbteditor.editor.unsaved.title"), TextInst.translatable("nbteditor.editor.unsaved.desc"),

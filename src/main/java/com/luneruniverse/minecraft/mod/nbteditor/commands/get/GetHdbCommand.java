@@ -1,10 +1,5 @@
 package com.luneruniverse.minecraft.mod.nbteditor.commands.get;
 
-import static com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.ClientCommandManager.argument;
-import static com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.ClientCommandManager.literal;
-
-import java.util.Map;
-
 import com.luneruniverse.minecraft.mod.nbteditor.commands.ClientCommand;
 import com.luneruniverse.minecraft.mod.nbteditor.commands.arguments.EnumArgumentType;
 import com.luneruniverse.minecraft.mod.nbteditor.containers.ContainerIOs;
@@ -17,20 +12,23 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.ChatFormatting;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.Nullable;
 import tsp.headdb.ported.Category;
 import tsp.headdb.ported.Head;
 import tsp.headdb.ported.HeadAPI;
 import tsp.headdb.ported.inventory.InventoryUtils;
+
+import java.util.Map;
+
+import static com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.ClientCommandManager.argument;
+import static com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.ClientCommandManager.literal;
 
 public class GetHdbCommand extends ClientCommand {
 	
@@ -48,24 +46,8 @@ public class GetHdbCommand extends ClientCommand {
 		if (dyeColor == null) {
 			return Blocks.SHULKER_BOX;
 		} else {
-			return switch (dyeColor) {
-				case WHITE -> Blocks.WHITE_SHULKER_BOX;
-				case ORANGE -> Blocks.ORANGE_SHULKER_BOX;
-				case MAGENTA -> Blocks.MAGENTA_SHULKER_BOX;
-				case LIGHT_BLUE -> Blocks.LIGHT_BLUE_SHULKER_BOX;
-				case YELLOW -> Blocks.YELLOW_SHULKER_BOX;
-				case LIME -> Blocks.LIME_SHULKER_BOX;
-				case PINK -> Blocks.PINK_SHULKER_BOX;
-				case GRAY -> Blocks.GRAY_SHULKER_BOX;
-				case LIGHT_GRAY -> Blocks.LIGHT_GRAY_SHULKER_BOX;
-				case CYAN -> Blocks.CYAN_SHULKER_BOX;
-				case BLUE -> Blocks.BLUE_SHULKER_BOX;
-				case BROWN -> Blocks.BROWN_SHULKER_BOX;
-				case GREEN -> Blocks.GREEN_SHULKER_BOX;
-				case RED -> Blocks.RED_SHULKER_BOX;
-				case BLACK -> Blocks.BLACK_SHULKER_BOX;
-				case PURPLE -> Blocks.PURPLE_SHULKER_BOX;
-			};
+			// 26.2: dyed shulker boxes moved to Blocks.DYED_SHULKER_BOX (ColorCollection)
+			return Blocks.DYED_SHULKER_BOX.pick(dyeColor);
 		}
 	}
 
@@ -116,7 +98,7 @@ public class GetHdbCommand extends ClientCommand {
 					if (!HeadAPI.checkUpdated())
 						return Command.SINGLE_SUCCESS;
 					String query = context.getArgument("query", String.class);
-					ItemStack shulker = new ItemStack(Items.BROWN_SHULKER_BOX);
+					ItemStack shulker = new ItemStack(Items.DYED_SHULKER_BOX.pick(net.minecraft.world.item.DyeColor.BROWN));
 					shulker.set(DataComponents.CUSTOM_NAME,TextInst.of(ChatFormatting.RESET.toString() + ChatFormatting.GOLD + ChatFormatting.BOLD + TextInst.translatable("nbteditor.hdb.search").getString() + ": " + query));
 					ItemTagReferences.HIDE_FLAGS.set(shulker, Map.of(HideFlag.CONTAINER, true));
 					ContainerIOs.writeRecursively(shulker, HeadAPI.getHeadsByName(query).stream().map(Head::getItemStack).toList());

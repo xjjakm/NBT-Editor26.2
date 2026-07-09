@@ -1,5 +1,29 @@
 package com.luneruniverse.minecraft.mod.nbteditor.containers;
 
+import com.luneruniverse.minecraft.mod.nbteditor.localnbt.*;
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVRegistry;
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.networking.MVClientNetworking;
+import com.luneruniverse.minecraft.mod.nbteditor.server.ServerMVMisc;
+import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.ItemTagReferences;
+import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.vehicle.boat.ChestBoat;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.TypedEntityData;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
+import net.minecraft.world.level.block.entity.BlockEntityTypes;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -7,41 +31,6 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
-import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalBlock;
-import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalEntity;
-import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalItem;
-import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalItemStack;
-import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalNBT;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVRegistry;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Reflection;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.networking.MVClientNetworking;
-import com.luneruniverse.minecraft.mod.nbteditor.server.ServerMVMisc;
-import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.ItemTagReferences;
-import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
-
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.world.entity.vehicle.boat.ChestBoat;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.ShulkerBoxBlock;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.component.TypedEntityData;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.BoatItem;
-import net.minecraft.world.item.BundleItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.SpawnEggItem;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
 
 public class ContainerIOs {
 	
@@ -80,9 +69,9 @@ public class ContainerIOs {
 	private static final ItemBlockContainerIO CAMPFIRE_IO = ItemBlockContainerIO.forSlotKeyItems(4);
 	private static final ItemBlockContainerIO DISPENSER_IO = ItemBlockContainerIO.forSlotKeyItems(9);
 	private static final ItemBlockContainerIO HOPPER_IO = ItemBlockContainerIO.forSlotKeyItems(5);
-	private static final ItemBlockContainerIO JUKEBOX_IO = ItemBlockContainerIO.forKeys(BlockEntityType.JUKEBOX, "RecordItem");
+	private static final ItemBlockContainerIO JUKEBOX_IO = ItemBlockContainerIO.forKeys(BlockEntityTypes.JUKEBOX, "RecordItem");
 	private static final ItemBlockContainerIO LECTERN_IO = BlockStateUpdatingContainerIO.forItemBlock(
-			ItemBlockContainerIO.forKeys(BlockEntityType.LECTERN, "Book"), "has_book");
+			ItemBlockContainerIO.forKeys(BlockEntityTypes.LECTERN, "Book"), "has_book");
 	private static final Function<EntityType<?>, ItemEntityContainerIO> ITEM_FRAME_IO =
 			entityId -> ItemEntityContainerIO.forKeys(entityId, "Item");
 	private static final ContainerIO<ItemStack> BUNDLE_IO = Version.<ContainerIO<ItemStack>>newSwitch()
@@ -95,13 +84,13 @@ public class ContainerIOs {
 			.range(null, "1.19.4", () -> null)
 			.get();
 	private static final ItemBlockContainerIO SUSPICIOUS_SAND_IO = Version.<ItemBlockContainerIO>newSwitch()
-			.range("1.20.0", null, () -> ItemBlockContainerIO.forKeys(BlockEntityType.BRUSHABLE_BLOCK, "item"))
+			.range("1.20.0", null, () -> ItemBlockContainerIO.forKeys(BlockEntityTypes.BRUSHABLE_BLOCK, "item"))
 			.range(null, "1.19.4", () -> null)
 			.get();
 	private static final ItemBlockContainerIO DECORATED_POT_IO = Version.<ItemBlockContainerIO>newSwitch()
 			.range("1.20.5", null, () -> new ItemBlockContainerIO(
 					new ContainerComponentContainerIO(1), ContainerIO.forLocalNBT(new KeysContainerIO(false, "item"))))
-			.range("1.20.3", "1.20.4", () -> ItemBlockContainerIO.forKeys(BlockEntityType.DECORATED_POT, "item"))
+			.range("1.20.3", "1.20.4", () -> ItemBlockContainerIO.forKeys(BlockEntityTypes.DECORATED_POT, "item"))
 			.range(null, "1.20.2", () -> null)
 			.get();
 	private static final ItemBlockContainerIO CRAFTER_IO = Version.<ItemBlockContainerIO>newSwitch()
@@ -149,12 +138,12 @@ public class ContainerIOs {
 							new ArmorHandsContainerIO(), new KeysContainerIO(false, "DecorItem"), new DonkeyChestContainerIO(true)))
 					.get());
 	private static final ContainerIO<LocalEntity> VILLAGER_IO = new ConcatContainerIO<>(
-			EQUIPMENT_IO.apply(EntityType.VILLAGER).entity(),
+			EQUIPMENT_IO.apply(EntityTypes.VILLAGER).entity(),
 			ContainerIO.forLocalNBT(new OrderNbtListContainerIO(8).forNbtCompound("Inventory")));
 	private static final ItemEntityContainerIO CHEST_MINECART_IO = ItemEntityContainerIO.forEntityTagIO(
-			new SlotKeyNbtListContainerIO(27).forNbtCompoundItems(), EntityType.CHEST_MINECART);
+			new SlotKeyNbtListContainerIO(27).forNbtCompoundItems(), EntityTypes.CHEST_MINECART);
 	private static final ItemEntityContainerIO HOPPER_MINECART_IO = ItemEntityContainerIO.forEntityTagIO(
-			new SlotKeyNbtListContainerIO(5).forNbtCompoundItems(), EntityType.FURNACE_MINECART);
+			new SlotKeyNbtListContainerIO(5).forNbtCompoundItems(), EntityTypes.FURNACE_MINECART);
 	private static final Function<EntityType<?>, ItemEntityContainerIO> CHEST_BOAT_IO =
 			entityType -> Version.<ItemEntityContainerIO>newSwitch()
 					.range("1.19.0", null, () -> ItemEntityContainerIO.forEntityTagIO(
@@ -163,7 +152,7 @@ public class ContainerIOs {
 					.get();
 	private static final ContainerIO<LocalEntity> ALLAY_IO = Version.<ContainerIO<LocalEntity>>newSwitch()
 			.range("1.19.0", null, () -> new ConcatContainerIO<>(
-					EQUIPMENT_IO.apply(EntityType.ALLAY).entity(),
+					EQUIPMENT_IO.apply(EntityTypes.ALLAY).entity(),
 					ContainerIO.forLocalNBT(new OrderNbtListContainerIO(1).forNbtCompound("Inventory"))))
 			.range(null, "1.18.2", () -> null)
 			.get();
@@ -191,8 +180,8 @@ public class ContainerIOs {
 		registerItemBlockIO((BlockItem) Items.HOPPER, HOPPER_IO);
 		registerItemBlockIO((BlockItem) Items.JUKEBOX, JUKEBOX_IO);
 		registerItemBlockIO((BlockItem) Items.LECTERN, LECTERN_IO);
-		registerItemEntityIO(Items.ITEM_FRAME, EntityType.ITEM_FRAME, ITEM_FRAME_IO);
-		registerItemEntityIO(Items.GLOW_ITEM_FRAME, EntityType.GLOW_ITEM_FRAME, ITEM_FRAME_IO);
+		registerItemEntityIO(Items.ITEM_FRAME, EntityTypes.ITEM_FRAME, ITEM_FRAME_IO);
+		registerItemEntityIO(Items.GLOW_ITEM_FRAME, EntityTypes.GLOW_ITEM_FRAME, ITEM_FRAME_IO);
 		for (Item item : MVRegistry.ITEM) {
 			if (item instanceof BundleItem bundle)
 				registerItemIO(bundle, BUNDLE_IO);
@@ -214,32 +203,32 @@ public class ContainerIOs {
 				.range(null, "1.20.6", () -> {})
 				.run();
 		
-		registerItemEntityIO(Items.ARMOR_STAND, EntityType.ARMOR_STAND, EQUIPMENT_IO);
+		registerItemEntityIO(Items.ARMOR_STAND, EntityTypes.ARMOR_STAND, EQUIPMENT_IO);
 		for (Item item : MVRegistry.ITEM) {
 			if (item instanceof SpawnEggItem spawnEgg)
 				registerItemIO(spawnEgg, SPAWN_EGG_IO);
 		}
 		
-		registerEntityIO(EntityType.HORSE, HORSE_IO);
-		registerEntityIO(EntityType.SKELETON_HORSE, BASIC_HORSE_IO);
-		registerEntityIO(EntityType.ZOMBIE_HORSE, BASIC_HORSE_IO);
+		registerEntityIO(EntityTypes.HORSE, HORSE_IO);
+		registerEntityIO(EntityTypes.SKELETON_HORSE, BASIC_HORSE_IO);
+		registerEntityIO(EntityTypes.ZOMBIE_HORSE, BASIC_HORSE_IO);
 		Version.newSwitch()
-				.range("1.20.0", null, () -> registerEntityIO(EntityType.CAMEL, BASIC_HORSE_IO))
+				.range("1.20.0", null, () -> registerEntityIO(EntityTypes.CAMEL, BASIC_HORSE_IO))
 				.range(null, "1.19.4", () -> {})
 				.run();
-		registerEntityIO(EntityType.DONKEY, DONKEY_IO);
-		registerEntityIO(EntityType.MULE, DONKEY_IO);
-		registerEntityIO(EntityType.LLAMA, LLAMA_IO);
-		registerEntityIO(EntityType.TRADER_LLAMA, LLAMA_IO);
-		registerEntityIO(EntityType.VILLAGER, VILLAGER_IO);
+		registerEntityIO(EntityTypes.DONKEY, DONKEY_IO);
+		registerEntityIO(EntityTypes.MULE, DONKEY_IO);
+		registerEntityIO(EntityTypes.LLAMA, LLAMA_IO);
+		registerEntityIO(EntityTypes.TRADER_LLAMA, LLAMA_IO);
+		registerEntityIO(EntityTypes.VILLAGER, VILLAGER_IO);
 		Version.newSwitch()
 				.range("1.20.3", null, () -> {
-					registerItemEntityIO(Items.CHEST_MINECART, EntityType.CHEST_MINECART, CHEST_MINECART_IO);
-					registerItemEntityIO(Items.HOPPER_MINECART, EntityType.HOPPER_MINECART, HOPPER_MINECART_IO);
+					registerItemEntityIO(Items.CHEST_MINECART, EntityTypes.CHEST_MINECART, CHEST_MINECART_IO);
+					registerItemEntityIO(Items.HOPPER_MINECART, EntityTypes.HOPPER_MINECART, HOPPER_MINECART_IO);
 				})
 				.range(null, "1.20.2", () -> {
-					registerEntityIO(EntityType.CHEST_MINECART, CHEST_MINECART_IO.entity());
-					registerEntityIO(EntityType.HOPPER_MINECART, HOPPER_MINECART_IO.entity());
+					registerEntityIO(EntityTypes.CHEST_MINECART, CHEST_MINECART_IO.entity());
+					registerEntityIO(EntityTypes.HOPPER_MINECART, HOPPER_MINECART_IO.entity());
 				})
 				.run();
 		Map<EntityType<?>, BoatItem> boatItems = new HashMap<>();
@@ -253,7 +242,7 @@ public class ContainerIOs {
 				.range(null, "1.20.2", () -> {})
 				.run();
 		Version.newSwitch()
-				.range("1.19.0", null, () -> registerEntityIO(EntityType.ALLAY, ALLAY_IO))
+				.range("1.19.0", null, () -> registerEntityIO(EntityTypes.ALLAY, ALLAY_IO))
 				.range(null, "1.18.2", () -> {})
 				.run();
 		MVClientNetworking.PlayNetworkStateEvents.Join.EVENT.register(() -> {

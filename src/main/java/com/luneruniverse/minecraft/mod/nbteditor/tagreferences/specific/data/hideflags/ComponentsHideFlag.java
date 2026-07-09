@@ -1,5 +1,20 @@
 package com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific.data.hideflags;
 
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVComponentType;
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Reflection;
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.JukeboxPlayable;
+import net.minecraft.world.item.component.DyedItemColor;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
+import net.minecraft.world.item.equipment.trim.ArmorTrim;
+
 import java.lang.invoke.MethodType;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -7,23 +22,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
-
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVComponentType;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Reflection;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
-
-import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.world.item.component.ItemAttributeModifiers;
-import net.minecraft.world.item.component.DyedItemColor;
-import net.minecraft.world.item.component.TooltipDisplay;
-import net.minecraft.world.item.enchantment.ItemEnchantments;
-import net.minecraft.world.item.JukeboxPlayable;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.equipment.trim.ArmorTrim;
-import net.minecraft.network.chat.Component;
-import net.minecraft.util.Unit;
 
 public class ComponentsHideFlag extends HideFlag {
 	
@@ -77,7 +75,7 @@ public class ComponentsHideFlag extends HideFlag {
 				if (showInTooltip && item.has(DataComponents.TOOLTIP_DISPLAY))
 					item.set(DataComponents.TOOLTIP_DISPLAY,new TooltipDisplay(item.get(DataComponents.TOOLTIP_DISPLAY).hideTooltip(),item.get(DataComponents.TOOLTIP_DISPLAY).hiddenComponents()));
 				else
-					item.set(DataComponents.TOOLTIP_DISPLAY, new TooltipDisplay(true,new LinkedHashSet<DataComponentType<?>>()));
+					item.set(DataComponents.TOOLTIP_DISPLAY, new TooltipDisplay(true, new LinkedHashSet<>()));
 			});
 	public static final HideFlag DYED_COLOR = registerMethodGetter("dyed_color",
 			DataComponents.DYED_COLOR, DyedItemColor.class, "comp_2385", "method_58422");

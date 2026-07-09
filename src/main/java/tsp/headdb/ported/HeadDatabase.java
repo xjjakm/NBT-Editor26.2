@@ -1,26 +1,16 @@
 package tsp.headdb.ported;
 
+import com.google.gson.*;
+import com.luneruniverse.minecraft.mod.nbteditor.NBTEditor;
+import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.luneruniverse.minecraft.mod.nbteditor.NBTEditor;
-import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
 
 /**
  * This is the Database that holds all heads
@@ -145,7 +135,7 @@ public class HeadDatabase {
     }
     
     public List<Category> getCategories() {
-    	return Collections.unmodifiableList(new ArrayList<>(HEADS.keySet()));
+    	return List.copyOf(HEADS.keySet());
     }
 
     /**
@@ -266,9 +256,7 @@ public class HeadDatabase {
 
         HEADS.clear();
         HEADS.putAll(heads);
-        HEADS.forEach((e,h)->{
-            h.removeIf(s->s.getItemStack() == null);
-        });
+        HEADS.forEach((e,h)-> h.removeIf(s->s.getItemStack() == null));
         HeadAPI.resolveFavorites();
         return true;
     }

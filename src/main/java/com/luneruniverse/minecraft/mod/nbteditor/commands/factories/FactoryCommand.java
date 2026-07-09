@@ -1,8 +1,5 @@
 package com.luneruniverse.minecraft.mod.nbteditor.commands.factories;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.luneruniverse.minecraft.mod.nbteditor.commands.ClientCommandGroup;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.FabricClientCommandSource;
@@ -12,6 +9,9 @@ import com.luneruniverse.minecraft.mod.nbteditor.screens.factories.LocalFactoryS
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FactoryCommand extends ClientCommandGroup {
 	
@@ -57,7 +57,7 @@ public class FactoryCommand extends ClientCommandGroup {
 		super.register(builder, path);
 		builder.executes(context -> {
 			NBTReference.getReference(NBTReferenceFilter.ANY, false,
-					ref -> MainUtil.client.setScreen(new LocalFactoryScreen<>(ref)));
+					ref -> MainUtil.client.gui.setScreen(new LocalFactoryScreen<>(ref)));
 			return Command.SINGLE_SUCCESS;
 		});
 	}

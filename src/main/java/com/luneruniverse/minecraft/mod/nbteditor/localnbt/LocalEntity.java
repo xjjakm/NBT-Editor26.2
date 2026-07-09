@@ -1,21 +1,7 @@
 package com.luneruniverse.minecraft.mod.nbteditor.localnbt;
 
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-
 import com.luneruniverse.minecraft.mod.nbteditor.NBTEditorClient;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.IdentifierInst;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVDrawableHelper;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMatrix4f;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVQuaternionf;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVRegistry;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVTextEvents;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.*;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.nbt.manager.NBTManagers;
 import com.luneruniverse.minecraft.mod.nbteditor.nbtreferences.EntityReference;
 import com.luneruniverse.minecraft.mod.nbteditor.packets.SummonEntityC2SPacket;
@@ -23,32 +9,33 @@ import com.luneruniverse.minecraft.mod.nbteditor.packets.ViewEntityS2CPacket;
 import com.luneruniverse.minecraft.mod.nbteditor.server.ServerMVMisc;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.ItemTagReferences;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
-
-import net.minecraft.client.Minecraft;
-import com.mojang.blaze3d.platform.Lighting;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntArrayTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.component.TypedEntityData;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix3x2fStack;
+
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class LocalEntity implements LocalNBT {
 	
@@ -151,28 +138,28 @@ public class LocalEntity implements LocalNBT {
 				output = new ItemStack(spawnEggItem);
 		}
 		if (output == null) {
-			if (entityType == EntityType.ARMOR_STAND)
+			if (entityType == EntityTypes.ARMOR_STAND)
 				output = new ItemStack(Items.ARMOR_STAND);
-			else if (entityType == EntityType.ITEM_FRAME)
+			else if (entityType == EntityTypes.ITEM_FRAME)
 				output = new ItemStack(Items.ITEM_FRAME);
-			else if (entityType == EntityType.GLOW_ITEM_FRAME)
+			else if (entityType == EntityTypes.GLOW_ITEM_FRAME)
 				output = new ItemStack(Items.GLOW_ITEM_FRAME);
-			else if (entityType == EntityType.PAINTING)
+			else if (entityType == EntityTypes.PAINTING)
 				output = new ItemStack(Items.PAINTING);
 			else {
 				output = Version.<ItemStack>newSwitch()
 						.range("1.20.3", null, () -> {
-							if (entityType == EntityType.COMMAND_BLOCK_MINECART)
+							if (entityType == EntityTypes.COMMAND_BLOCK_MINECART)
 								return new ItemStack(Items.COMMAND_BLOCK_MINECART);
-							if (entityType == EntityType.FURNACE_MINECART)
+							if (entityType == EntityTypes.FURNACE_MINECART)
 								return new ItemStack(Items.FURNACE_MINECART);
-							if (entityType == EntityType.MINECART)
+							if (entityType == EntityTypes.MINECART)
 								return new ItemStack(Items.MINECART);
-							if (entityType == EntityType.CHEST_MINECART)
+							if (entityType == EntityTypes.CHEST_MINECART)
 								return new ItemStack(Items.CHEST_MINECART);
-							if (entityType == EntityType.HOPPER_MINECART)
+							if (entityType == EntityTypes.HOPPER_MINECART)
 								return new ItemStack(Items.HOPPER_MINECART);
-							if (entityType == EntityType.TNT_MINECART)
+							if (entityType == EntityTypes.TNT_MINECART)
 								return new ItemStack(Items.TNT_MINECART);
 							if (getCachedEntity() instanceof AbstractBoat)
 								return new ItemStack(MVMisc.getBoatItem(entityType, nbt));
@@ -190,8 +177,8 @@ public class LocalEntity implements LocalNBT {
 			nbt.remove("Passengers"); // Passengers don't work on spawn eggs
 			nbt.remove("UUID");
 			nbt.remove("Pos");
-			if (entityType == EntityType.ITEM_FRAME || entityType == EntityType.GLOW_ITEM_FRAME ||
-					entityType == EntityType.PAINTING) {
+			if (entityType == EntityTypes.ITEM_FRAME || entityType == EntityTypes.GLOW_ITEM_FRAME ||
+					entityType == EntityTypes.PAINTING) {
 				nbt.remove("Rotation");
 				Version.newSwitch()
 						.range("1.21.5", null, () -> nbt.remove("block_pos"))
@@ -201,7 +188,7 @@ public class LocalEntity implements LocalNBT {
 							nbt.remove("TileZ");
 						})
 						.run();
-				if (entityType == EntityType.PAINTING)
+				if (entityType == EntityTypes.PAINTING)
 					nbt.remove("facing");
 				else
 					nbt.remove("Facing");
@@ -235,8 +222,9 @@ public class LocalEntity implements LocalNBT {
 						.map(packet -> {
 							EntityReference ref = new EntityReference(packet.getWorld(), packet.getUUID(),
 									MVRegistry.ENTITY_TYPE.get(packet.getId()), packet.getNbt());
-							MainUtil.client.player.sendSystemMessage(TextInst.translatable("nbteditor.get.entity")
-									.append(ref.getLocalNBT().toHoverableText()));
+							if (MainUtil.client.player != null)
+								MainUtil.client.player.sendSystemMessage(TextInst.translatable("nbteditor.get.entity")
+										.append(ref.getLocalNBT().toHoverableText()));
 							return ref;
 						}));
 	}

@@ -1,9 +1,5 @@
 package com.luneruniverse.minecraft.mod.nbteditor.screens.containers;
 
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.input.KeyEvent;
-import org.lwjgl.glfw.GLFW;
-
 import com.luneruniverse.minecraft.mod.nbteditor.NBTEditorClient;
 import com.luneruniverse.minecraft.mod.nbteditor.containers.ContainerIOs;
 import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalNBT;
@@ -16,11 +12,13 @@ import com.luneruniverse.minecraft.mod.nbteditor.nbtreferences.itemreferences.It
 import com.luneruniverse.minecraft.mod.nbteditor.screens.ConfigScreen;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.factories.LocalFactoryScreen;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
-
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import org.lwjgl.glfw.GLFW;
 
 public class ContainerScreen<L extends LocalNBT> extends ClientHandledScreen {
 	
@@ -77,7 +75,7 @@ public class ContainerScreen<L extends LocalNBT> extends ClientHandledScreen {
 		
 		addRenderableWidget(MVMisc.newTexturedButton(width - 36, 22, 20, 20, 20,
 				LocalFactoryScreen.FACTORY_ICON,
-				btn -> minecraft.setScreen(new LocalFactoryScreen<>(ref)),
+				_ -> minecraft.gui.setScreen(new LocalFactoryScreen<>(ref)),
 				new MVTooltip("nbteditor.factory")));
 	}
 	
@@ -126,9 +124,7 @@ public class ContainerScreen<L extends LocalNBT> extends ClientHandledScreen {
 		ContainerIOs.write(localNBT, contents);
 		
 		saved = false;
-		ref.saveLocalNBT(localNBT, () -> {
-			saved = true;
-		});
+		ref.saveLocalNBT(localNBT, () -> saved = true);
 	}
 	
 	public boolean keyPressed(KeyEvent keyInput) {

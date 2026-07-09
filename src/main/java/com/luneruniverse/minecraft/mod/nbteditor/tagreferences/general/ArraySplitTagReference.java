@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import net.minecraft.nbt.CompoundTag;
-
 public class ArraySplitTagReference<C, O> implements TagReference<List<C>, O> {
 
 	

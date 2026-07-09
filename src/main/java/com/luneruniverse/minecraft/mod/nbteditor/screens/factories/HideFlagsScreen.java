@@ -1,24 +1,18 @@
 package com.luneruniverse.minecraft.mod.nbteditor.screens.factories;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
-
 import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalItem;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.ScreenTexts;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
 import com.luneruniverse.minecraft.mod.nbteditor.nbtreferences.itemreferences.ItemReference;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.LocalEditorScreen;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.ConfigBar;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.ConfigButton;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.ConfigCategory;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.ConfigHiddenData;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.ConfigItem;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.ConfigPanel;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.ConfigValueBoolean;
+import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.*;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.ItemTagReferences;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific.data.hideflags.HideFlag;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
 public class HideFlagsScreen extends LocalEditorScreen<LocalItem> {
 	
@@ -57,16 +51,14 @@ public class HideFlagsScreen extends LocalEditorScreen<LocalItem> {
 					flag.getKey(), (flag2, defaults) -> flag2));
 		}
 		
-		config.addValueListener(source -> {
-			config.getConfigurables().forEach((flagName, path) -> {
-				if (path instanceof ConfigHiddenData configHiddenData &&
-						((ConfigItem<?>) configHiddenData.getVisible()).getValue() == source) {
-					ItemTagReferences.HIDE_FLAGS.set(localNBT.getEditableItem(),
-							Map.of((HideFlag) configHiddenData.getData(), (Boolean) source.getValidValue()));
-					checkSave();
-				}
-			});
-		});
+		config.addValueListener(source -> config.getConfigurables().forEach((flagName, path) -> {
+            if (path instanceof ConfigHiddenData configHiddenData &&
+                    ((ConfigItem<?>) configHiddenData.getVisible()).getValue() == source) {
+                ItemTagReferences.HIDE_FLAGS.set(localNBT.getEditableItem(),
+                        Map.of((HideFlag) configHiddenData.getData(), (Boolean) source.getValidValue()));
+                checkSave();
+            }
+        }));
 	}
 	
 	@Override

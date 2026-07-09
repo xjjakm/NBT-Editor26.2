@@ -20,16 +20,14 @@ public class ClientChestItemReference implements ItemReference {
 		this.page = page;
 		this.slot = slot;
 		
-		this.save = new SaveQueue<>("ClientChest/" + (page + 1) + "/" + slot, toSave -> {
-			ClientChestHelper.getPage(page, PageLoadLevel.DYNAMIC_ITEMS).join().ifPresent(pageData -> {
-				if (MainUtil.client.screen instanceof ClientChestScreen screen && ClientChestScreen.PAGE == page)
-					screen.getMenu().getSlot(slot).set(toSave);
-				
-				pageData.getItemsOrThrow()[slot] = toSave;
-				pageData.dynamicItems().remove(slot);
-				ClientChestHelper.setPage(page, pageData.items(), pageData.dynamicItems()).join();
-			});
-		}, true);
+		this.save = new SaveQueue<>("ClientChest/" + (page + 1) + "/" + slot, toSave -> ClientChestHelper.getPage(page, PageLoadLevel.DYNAMIC_ITEMS).join().ifPresent(pageData -> {
+            if (MainUtil.client.gui.screen() instanceof ClientChestScreen screen && ClientChestScreen.PAGE == page)
+                screen.getMenu().getSlot(slot).set(toSave);
+
+            pageData.getItemsOrThrow()[slot] = toSave;
+            pageData.dynamicItems().remove(slot);
+            ClientChestHelper.setPage(page, pageData.items(), pageData.dynamicItems()).join();
+        }), true);
 	}
 	
 	public int getPage() {
@@ -51,8 +49,8 @@ public class ClientChestItemReference implements ItemReference {
 	
 	@Override
 	public void saveItem(ItemStack toSave, Runnable onFinished) {
-		if (MainUtil.client.screen instanceof ClientChestScreen && ClientChestScreen.PAGE == page)
-			((ClientChestScreen) MainUtil.client.screen).getMenu().getSlot(slot).set(toSave);
+		if (MainUtil.client.gui.screen() instanceof ClientChestScreen screen && ClientChestScreen.PAGE == page)
+			screen.getMenu().getSlot(slot).set(toSave);
 		save.save(onFinished, toSave.copy());
 	}
 	

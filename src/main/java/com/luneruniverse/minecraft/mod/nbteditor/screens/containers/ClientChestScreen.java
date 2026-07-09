@@ -1,9 +1,5 @@
 package com.luneruniverse.minecraft.mod.nbteditor.screens.containers;
 
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.input.KeyEvent;
-import org.lwjgl.glfw.GLFW;
-
 import com.luneruniverse.minecraft.mod.nbteditor.NBTEditorClient;
 import com.luneruniverse.minecraft.mod.nbteditor.clientchest.ClientChestHelper;
 import com.luneruniverse.minecraft.mod.nbteditor.clientchest.ClientChestPage;
@@ -20,13 +16,15 @@ import com.luneruniverse.minecraft.mod.nbteditor.screens.LoadingScreen;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.util.FancyConfirmScreen;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.widgets.NamedTextFieldWidget;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
-
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import org.lwjgl.glfw.GLFW;
 
 import static com.luneruniverse.minecraft.mod.nbteditor.NBTEditor.hasShiftDown;
 
@@ -50,11 +48,11 @@ public class ClientChestScreen extends ClientHandledScreen {
 					
 					if (!pageData.isInThisVersion()) {
 						NBTEditorClient.CURSOR_MANAGER.closeRoot();
-						MainUtil.client.setScreen(new ClientChestDataVersionScreen(pageData.dataVersion()));
+						MainUtil.client.gui.setScreen(new ClientChestDataVersionScreen(pageData.dataVersion()));
 						return;
 					}
 					
-					if (MainUtil.client.screen instanceof ClientChestScreen screen) {
+					if (MainUtil.client.gui.screen() instanceof ClientChestScreen screen) {
 						screen.setPageData(pageData);
 						MainUtil.setTextFieldValueSilently(screen.pageField, (PAGE + 1) + "", true);
 						screen.updatePageNavigation();
@@ -154,25 +152,25 @@ public class ClientChestScreen extends ClientHandledScreen {
 			nextKeybind = temp;
 		}
 		
-		this.addRenderableWidget(prevPage = MVMisc.newButton(this.leftPos - 87, this.topPos + 20, 20, 20, TextInst.of("<"), btn -> {
+		this.addRenderableWidget(prevPage = MVMisc.newButton(this.leftPos - 87, this.topPos + 20, 20, 20, TextInst.of("<"), _ -> {
 			navigationClicked = true;
 			prevPage();
 		}, ConfigScreen.isKeybindsHidden() ? null : new MVTooltip(TextInst.literal("")
 				.append(prevKeybind).append(TextInst.translatable("nbteditor.keybind.page.prev")))));
 		
-		this.addRenderableWidget(nextPage = MVMisc.newButton(this.leftPos - 24, this.topPos + 20, 20, 20, TextInst.of(">"), btn -> {
+		this.addRenderableWidget(nextPage = MVMisc.newButton(this.leftPos - 24, this.topPos + 20, 20, 20, TextInst.of(">"), _ -> {
 			navigationClicked = true;
 			nextPage();
 		}, ConfigScreen.isKeybindsHidden() ? null : new MVTooltip(TextInst.literal("")
 				.append(nextKeybind).append(TextInst.translatable("nbteditor.keybind.page.next")))));
 		
-		this.addRenderableWidget(prevPageJump = MVMisc.newButton(this.leftPos - 87, this.topPos + 44, 39, 20, TextInst.of("<<"), btn -> {
+		this.addRenderableWidget(prevPageJump = MVMisc.newButton(this.leftPos - 87, this.topPos + 44, 39, 20, TextInst.of("<<"), _ -> {
 			navigationClicked = true;
 			prevPageJump();
 		}, ConfigScreen.isKeybindsHidden() ? null : new MVTooltip(TextInst.translatable("nbteditor.keybind.page.shift")
 				.append(prevKeybind).append(TextInst.translatable("nbteditor.keybind.page.prev_jump")))));
-		
-		this.addRenderableWidget(nextPageJump = MVMisc.newButton(this.leftPos - 43, this.topPos + 44, 39, 20, TextInst.of(">>"), btn -> {
+
+		this.addRenderableWidget(nextPageJump = MVMisc.newButton(this.leftPos - 43, this.topPos + 44, 39, 20, TextInst.of(">>"), _ -> {
 			navigationClicked = true;
 			nextPageJump();
 		}, ConfigScreen.isKeybindsHidden() ? null : new MVTooltip(TextInst.translatable("nbteditor.keybind.page.shift")
@@ -188,21 +186,21 @@ public class ClientChestScreen extends ClientHandledScreen {
 			btn.setMessage(ConfigScreen.isLockSlots() ? TextInst.translatable("nbteditor.client_chest.slots.unlock") : TextInst.translatable("nbteditor.client_chest.slots.lock"));
 		})).active = !ConfigScreen.isLockSlotsRequired();
 		
-		this.addRenderableWidget(MVMisc.newButton(this.leftPos - 87, this.topPos + 92, 83, 20, TextInst.translatable("nbteditor.client_chest.reload_page"), btn -> {
+		this.addRenderableWidget(MVMisc.newButton(this.leftPos - 87, this.topPos + 92, 83, 20, TextInst.translatable("nbteditor.client_chest.reload_page"), _ -> {
 			navigationClicked = true;
 			LoadingScreen.show(ClientChestHelper.reloadPage(PAGE), this::onClose, (loaded, pageData) -> show());
 		}));
-		
-		this.addRenderableWidget(MVMisc.newButton(this.leftPos - 87, this.topPos + 116, 83, 20, TextInst.translatable("nbteditor.client_chest.clear_page"), btn -> {
+
+		this.addRenderableWidget(MVMisc.newButton(this.leftPos - 87, this.topPos + 116, 83, 20, TextInst.translatable("nbteditor.client_chest.clear_page"), _ -> {
 			navigationClicked = true;
-			minecraft.setScreen(new FancyConfirmScreen(value -> {
+			minecraft.gui.setScreen(new FancyConfirmScreen(value -> {
 				if (value) {
 					menu.getContainer().clearContent();
 					dynamicItems = new DynamicItems();
 					save();
 				}
 				
-				minecraft.setScreen(ClientChestScreen.this);
+				minecraft.gui.setScreen(ClientChestScreen.this);
 			}, TextInst.translatable("nbteditor.client_chest.clear_page.title"), TextInst.translatable("nbteditor.client_chest.clear_page.desc"),
 					TextInst.translatable("nbteditor.client_chest.clear_page.yes"), TextInst.translatable("nbteditor.client_chest.clear_page.no")));
 		}));

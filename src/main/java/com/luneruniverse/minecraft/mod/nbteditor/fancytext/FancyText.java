@@ -1,25 +1,16 @@
 package com.luneruniverse.minecraft.mod.nbteditor.fancytext;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
-
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.EditableText;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVTextEvents;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
 import com.luneruniverse.minecraft.mod.nbteditor.util.StyleUtil;
 import com.mojang.brigadier.StringReader;
-
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FontDescription;
-import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.network.chat.Style;
 import net.minecraft.ChatFormatting;
-import net.minecraft.resources.Identifier;
+import net.minecraft.network.chat.*;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class FancyText {
 	
@@ -36,8 +27,8 @@ public class FancyText {
 		EditableText output = TextInst.literal("");
 		Style style = base;
 		for (FancyTextNode node : nodes) {
-			if (node instanceof FancyTextTextNode text)
-				output.append(TextInst.literal(text.text()).setStyle(StyleUtil.minus(style, base)));
+			if (node instanceof FancyTextTextNode(String text))
+				output.append(TextInst.literal(text).setStyle(StyleUtil.minus(style, base)));
 			else if (node instanceof FancyTextStyleOptionNode event) {
 				if (numberOfTextNodes != 1 || event.getNumberOfTextNodes() == 1) {
 					Style eventStyle = event.modifyStyle(style);
@@ -48,7 +39,7 @@ public class FancyText {
 				style = node.modifyStyle(style);
 		}
 		if (numberOfTextNodes == 1)
-			return (EditableText) output.getSiblings().get(0);
+			return (EditableText) output.getSiblings().getFirst();
 		return output;
 	}
 	
@@ -107,7 +98,7 @@ public class FancyText {
 						errors.setPlain(true);
 					} else if (hoverAction == MVTextEvents.HoverAction.SHOW_ENTITY) {
 						output.append('{');
-						output.append(MVTextEvents.HoverAction.SHOW_ENTITY.getValue(partStyle.getHoverEvent()).uuid.toString());
+						output.append(MVTextEvents.HoverAction.SHOW_ENTITY.getValue(partStyle.getHoverEvent()).uuid);
 						output.append('}');
 						errors.setPlain(true);
 					}
@@ -118,11 +109,9 @@ public class FancyText {
 					output.append(partStyle.getInsertion().replace("\\", "\\\\").replace("{", "\\{").replace("}", "\\}"));
 					output.append("}(");
 				}
-				if (partStyle.getFont() != null) {
-					output.append("[font]{");
-					output.append(partStyle.getFont().toString());
-					output.append("}(");
-				}
+				output.append("[font]{");
+				output.append(partStyle.getFont());
+				output.append("}(");
 			}
 			
 			AtomicReference<Style> currentStyle =
@@ -140,11 +129,16 @@ public class FancyText {
 			}
 			
 			if (changes.getColor() != null) {
-				ChatFormatting formatting = ChatFormatting.getByName(changes.getColor().serialize());
+				ChatFormatting formatting;
+				try {
+					formatting = ChatFormatting.valueOf(changes.getColor().serialize().toUpperCase(Locale.ROOT));
+				} catch (IllegalArgumentException e) {
+					formatting = null;
+				}
 				if (formatting == null)
-					output.append("&" + changes.getColor().formatValue());
+					output.append("&").append(changes.getColor().formatValue());
 				else
-					output.append("&" + formatting.getChar());
+					output.append("&").append(formatting.toString().charAt(1));
 			}
 			if (StyleUtil.SHADOW_COLOR_EXISTS && changes.getShadowColor() != null) {
 				if (changes.getShadowColor() >>> 24 == 0xFF)

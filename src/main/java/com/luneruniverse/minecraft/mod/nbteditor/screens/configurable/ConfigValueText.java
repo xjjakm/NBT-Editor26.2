@@ -1,12 +1,12 @@
 package com.luneruniverse.minecraft.mod.nbteditor.screens.configurable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.widgets.NamedTextFieldWidget;
 import net.minecraft.client.input.MouseButtonEvent;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 public class ConfigValueText extends NamedTextFieldWidget implements ConfigValue<String, ConfigValueText> {
 	
@@ -22,9 +22,7 @@ public class ConfigValueText extends NamedTextFieldWidget implements ConfigValue
 		this.defaultValue = defaultValue;
 		this.onChanged = new ArrayList<>();
 		
-		super.setResponder(newValue -> {
-			onChanged.forEach(listener -> listener.onValueChanged(this));
-		});
+		super.setResponder(newValue -> onChanged.forEach(listener -> listener.onValueChanged(this)));
 	}
 	private ConfigValueText(int width, String value, String defaultValue, List<ConfigValueListener<ConfigValueText>> onChanged) {
 		this(width, value, defaultValue);

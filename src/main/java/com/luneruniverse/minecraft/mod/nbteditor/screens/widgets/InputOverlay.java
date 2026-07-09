@@ -1,23 +1,17 @@
 package com.luneruniverse.minecraft.mod.nbteditor.screens.widgets;
 
-import java.util.function.Consumer;
-
-import net.minecraft.client.input.KeyEvent;
-import org.joml.Matrix3x2fStack;
-import org.lwjgl.glfw.GLFW;
-
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVDrawable;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVDrawableHelper;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVElement;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.*;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.OverlayScreen;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.OverlaySupportingScreen;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
-
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
+import org.joml.Matrix3x2fStack;
+import org.lwjgl.glfw.GLFW;
+
+import java.util.function.Consumer;
 
 public class InputOverlay<T> extends GroupWidget implements InitializableOverlay<Screen> {
 	
@@ -59,12 +53,12 @@ public class InputOverlay<T> extends GroupWidget implements InitializableOverlay
 
 		
 		ok = addWidget(MVMisc.newButton(x, y + input.getHeight() + 4,
-				(input.getWidth() - 4) / 2, 20, TextInst.translatable("nbteditor.ok"), btn -> {
+				(input.getWidth() - 4) / 2, 20, TextInst.translatable("nbteditor.ok"), _ -> {
 			close.run();
 			valueConsumer.accept(input.getValue());
 		}));
 		addWidget(MVMisc.newButton(width / 2 + 2, y + input.getHeight() + 4,
-				(input.getWidth() - 4) / 2, 20, TextInst.translatable("nbteditor.cancel"), btn -> close.run()));
+				(input.getWidth() - 4) / 2, 20, TextInst.translatable("nbteditor.cancel"), _ -> close.run()));
 		
 		ok.active = input.isValid();
 
@@ -78,7 +72,7 @@ public class InputOverlay<T> extends GroupWidget implements InitializableOverlay
 		
 		matrices.pushMatrix();
 		matrices.translate(0.0f, 0.0f);
-		MainUtil.client.screen.extractBackground(MVDrawableHelper.getDrawContext(matrices), mouseX, mouseY, delta);
+		MainUtil.client.gui.screen().extractBackground(MVDrawableHelper.getDrawContext(matrices), mouseX, mouseY, delta);
 		if (title != null) {
 			MVDrawableHelper.drawCenteredTextWithShadow(matrices, MainUtil.client.font, title,
 					x + input.getWidth() / 2, y - 4 - MainUtil.client.font.lineHeight, -1);

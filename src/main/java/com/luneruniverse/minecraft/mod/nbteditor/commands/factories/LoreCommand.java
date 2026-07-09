@@ -1,11 +1,5 @@
 package com.luneruniverse.minecraft.mod.nbteditor.commands.factories;
 
-import static com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.ClientCommandManager.argument;
-import static com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.ClientCommandManager.literal;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import com.luneruniverse.minecraft.mod.nbteditor.commands.ClientCommand;
 import com.luneruniverse.minecraft.mod.nbteditor.commands.arguments.FancyTextArgumentType;
 import com.luneruniverse.minecraft.mod.nbteditor.misc.MixinLink;
@@ -22,13 +16,16 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.ClientCommandManager.argument;
+import static com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.ClientCommandManager.literal;
 
 public class LoreCommand extends ClientCommand {
 	
@@ -57,7 +54,8 @@ public class LoreCommand extends ClientCommand {
 			int pos = -1;
 			try {
 				pos = context.getArgument("line", Integer.class);
-			} catch (IllegalArgumentException e) {}
+			} catch (IllegalArgumentException e) { // Ignored
+		}
 			
 			ItemReference ref = ItemReference.getHeldItem();
 			ItemStack item = ref.getItem();
@@ -73,7 +71,8 @@ public class LoreCommand extends ClientCommand {
 			int pos = -1;
 			try {
 				pos = context.getArgument("line", Integer.class);
-			} catch (IllegalArgumentException e) {}
+			} catch (IllegalArgumentException e) { // Ignored
+		}
 			
 			ItemReference ref = ItemReference.getHeldItem();
 			ItemStack item = ref.getItem();
@@ -90,7 +89,8 @@ public class LoreCommand extends ClientCommand {
 			int pos = -1;
 			try {
 				pos = context.getArgument("line", Integer.class);
-			} catch (IllegalArgumentException e) {}
+			} catch (IllegalArgumentException e) { // Ignored
+		}
 			
 			ItemReference ref = ItemReference.getHeldItem();
 			ItemStack item = ref.getItem();
@@ -130,7 +130,7 @@ public class LoreCommand extends ClientCommand {
 						.styled(style -> style.withClickEvent(MVTextEvents.ClickAction.SUGGEST_COMMAND.newEvent("/factory display lore remove " + finalI))
 								.withHoverEvent(MVTextEvents.HoverAction.SHOW_TEXT.newEvent(TextInst.of("/factory display lore remove " + finalI))))
 						.append(TextInst.literal(" ").formatted(ChatFormatting.DARK_PURPLE).formatted(ChatFormatting.ITALIC).append(line)
-						.styled(style -> MixinLink.withRunClickEvent(style, () -> Screen.defaultHandleGameClickEvent(MVTextEvents.ClickAction.SUGGEST_COMMAND.newEvent("/factory display lore set " + finalI + " " + FancyTextArgumentType.stringifyFancyText(line, StyleUtil.BASE_LORE_STYLE, true)), MainUtil.client,MainUtil.client.screen))
+						.styled(style -> MixinLink.withRunClickEvent(style, () -> Screen.defaultHandleGameClickEvent(MVTextEvents.ClickAction.SUGGEST_COMMAND.newEvent("/factory display lore set " + finalI + " " + FancyTextArgumentType.stringifyFancyText(line, StyleUtil.BASE_LORE_STYLE, true)), MainUtil.client,MainUtil.client.gui.screen()))
 								.withHoverEvent(MVTextEvents.HoverAction.SHOW_TEXT.newEvent(TextInst.of("/factory display lore set " + finalI))))));
 				i++;
 			}
@@ -152,7 +152,7 @@ public class LoreCommand extends ClientCommand {
 				.then(literal("clear").executes(clear))
 				.then(literal("list").executes(list))
 			.executes(context -> {
-				MainUtil.client.setScreen(new DisplayScreen<>(ItemReference.getHeldItem()));
+				MainUtil.client.gui.setScreen(new DisplayScreen<>(ItemReference.getHeldItem()));
 				return Command.SINGLE_SUCCESS;
 			});
 	}

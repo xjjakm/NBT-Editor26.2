@@ -1,23 +1,14 @@
 package com.luneruniverse.minecraft.mod.nbteditor.tagreferences.general;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
-
 import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalNBT;
-
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.item.ItemStack;
+
+import java.lang.reflect.Array;
+import java.util.*;
+import java.util.function.*;
 
 public interface TagReference<T, O> {
 	public static <T1, T2, O> TagReference<T2, O> mapValue(Function<T1, T2> getter, Function<T2, T1> setter, TagReference<T1, O> tagRef) {
@@ -61,7 +52,7 @@ public interface TagReference<T, O> {
 			}
 			@Override
 			public void set(O object, T value) {
-				object.modifyNBT(nbt -> { tagRef.set(nbt, value); });
+				object.modifyNBT(nbt -> tagRef.set(nbt, value));
 			}
 		};
 	}

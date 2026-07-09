@@ -1,28 +1,19 @@
 package com.luneruniverse.minecraft.mod.nbteditor.multiversion.nbt.manager.components;
 
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Attempt;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.DynamicRegistryManagerHolder;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Reflection;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.nbt.manager.NBTManager;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
-
-import net.minecraft.data.registries.VanillaRegistries;
-import net.minecraft.util.ProblemReporter.PathElement;
-import net.minecraft.util.ProblemReporter.Problem;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.client.Minecraft;
-import net.minecraft.core.component.DataComponentMap;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.data.registries.VanillaRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.TagValueOutput;
-import net.minecraft.world.level.storage.ValueOutput;
-import net.minecraft.util.ProblemReporter;
 
 public class ComponentBlockEntityNBTManager implements NBTManager<BlockEntity> {
 	

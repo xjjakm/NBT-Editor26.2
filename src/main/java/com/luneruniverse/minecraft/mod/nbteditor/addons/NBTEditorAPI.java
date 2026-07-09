@@ -1,11 +1,5 @@
 package com.luneruniverse.minecraft.mod.nbteditor.addons;
 
-import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-
 import com.luneruniverse.minecraft.mod.nbteditor.NBTEditorClient;
 import com.luneruniverse.minecraft.mod.nbteditor.commands.ClientCommand;
 import com.luneruniverse.minecraft.mod.nbteditor.commands.factories.FactoryCommand;
@@ -31,17 +25,22 @@ import com.luneruniverse.minecraft.mod.nbteditor.util.NbtFormatter;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.datafixers.DSL.TypeReference;
-
-import net.minecraft.world.level.block.Block;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.block.Block;
+
+import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * The main API<br>
@@ -189,15 +188,16 @@ public class NBTEditorAPI {
 		Supplier<ItemStack> item = GetPresetCommand.registerPresetItem(name);
 		Supplier<ItemStack> reloadHandledItem = item;
 		if (!reloadable) {
-			reloadHandledItem = new Supplier<ItemStack>() {
-				private ItemStack value;
-				@Override
-				public ItemStack get() {
-					if (value == null)
-						value = item.get();
-					return value;
-				}
-			};
+			reloadHandledItem = new Supplier<>() {
+                private ItemStack value;
+
+                @Override
+                public ItemStack get() {
+                    if (value == null)
+                        value = item.get();
+                    return value;
+                }
+            };
 			GetPresetCommand.registerPresetItem(name, reloadHandledItem);
 		}
 		return reloadHandledItem;

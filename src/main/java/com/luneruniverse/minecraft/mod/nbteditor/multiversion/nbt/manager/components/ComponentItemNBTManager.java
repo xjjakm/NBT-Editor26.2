@@ -1,25 +1,23 @@
 package com.luneruniverse.minecraft.mod.nbteditor.multiversion.nbt.manager.components;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import com.luneruniverse.minecraft.mod.nbteditor.misc.MixinLink;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Attempt;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.DynamicRegistryManagerHolder;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.nbt.manager.DeserializableNBTManager;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
-
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.data.registries.VanillaRegistries;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.item.ItemStack;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ComponentItemNBTManager implements DeserializableNBTManager<ItemStack> {
 	
@@ -77,7 +75,7 @@ public class ComponentItemNBTManager implements DeserializableNBTManager<ItemSta
 		Optional<? extends Integer> maxDamage = (Optional<? extends Integer>) componentMap.get(DataComponents.MAX_DAMAGE);
 		Optional<? extends Integer> maxStackSize = (Optional<? extends Integer>) componentMap.get(DataComponents.MAX_STACK_SIZE);
 		if (maxDamage != null && maxDamage.isPresent() &&
-				(maxStackSize == null ?
+				(maxStackSize.isEmpty() ?
 						subject.getPrototype().get(DataComponents.MAX_STACK_SIZE) > 1 :
 						maxStackSize.isPresent() && maxStackSize.get() > 1)) {
 			components = components.forget(component -> component == DataComponents.MAX_DAMAGE);

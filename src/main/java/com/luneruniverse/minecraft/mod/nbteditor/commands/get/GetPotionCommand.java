@@ -58,12 +58,12 @@ public class GetPotionCommand extends ClientCommand {
 			List<MobEffectInstance> effects = new ArrayList<>(context.getArgument("effects", Collection.class));
 			Optional<Integer> color = Optional.empty();
 			if (!effects.isEmpty()) {
-				MobEffectInstance effect = effects.get(0);
-				Potion potion = MVRegistry.POTION.getEntrySet().stream().map(Map.Entry::getValue)
-						.filter(testPotion -> !testPotion.getEffects().isEmpty() &&
-								MVMisc.getEffectType(testPotion.getEffects().get(0)) == MVMisc.getEffectType(effect)).findFirst().orElse(null);
-				if (potion != null)
-					color = Optional.of(MVMisc.getEffectType(potion.getEffects().get(0)).getColor());
+				MobEffectInstance effect = effects.getFirst();
+			Potion potion = MVRegistry.POTION.getEntrySet().stream().map(Map.Entry::getValue)
+					.filter(testPotion -> !testPotion.getEffects().isEmpty() &&
+							MVMisc.getEffectType(testPotion.getEffects().getFirst()) == MVMisc.getEffectType(effect)).findFirst().orElse(null);
+			if (potion != null)
+				color = Optional.of(MVMisc.getEffectType(potion.getEffects().getFirst()).getColor());
 			}
 			ItemTagReferences.CUSTOM_POTION_CONTENTS.set(item, new CustomPotionContents(color, effects));
 			MainUtil.getWithMessage(item);

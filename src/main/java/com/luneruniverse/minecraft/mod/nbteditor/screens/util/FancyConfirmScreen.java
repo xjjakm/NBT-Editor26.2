@@ -3,12 +3,10 @@ package com.luneruniverse.minecraft.mod.nbteditor.screens.util;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.IgnoreCloseScreenPacket;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVDrawableHelper;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
-
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.network.chat.Component;
 import org.joml.Matrix3x2fStack;
 
@@ -18,11 +16,11 @@ public class FancyConfirmScreen extends ConfirmScreen implements IgnoreCloseScre
 	
 	public FancyConfirmScreen(BooleanConsumer callback, Component title, Component message, Component yesTranslated, Component noTranslated) {
 		super(callback, title, message, yesTranslated, noTranslated);
-		parent = MainUtil.client.screen;
+		parent = MainUtil.client.gui.screen();
 	}
 	public FancyConfirmScreen(BooleanConsumer callback, Component title, Component message) {
 		super(callback, title, message);
-		parent = MainUtil.client.screen;
+		parent = MainUtil.client.gui.screen();
 	}
 	
 	public FancyConfirmScreen setParent(Screen parent) {

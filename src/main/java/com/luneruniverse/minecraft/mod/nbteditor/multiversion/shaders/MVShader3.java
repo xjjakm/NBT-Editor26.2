@@ -1,22 +1,22 @@
 package com.luneruniverse.minecraft.mod.nbteditor.multiversion.shaders;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.ColorTargetState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.VertexFormat;
-
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.rendertype.RenderSetup;
-import net.minecraft.client.renderer.rendertype.RenderType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MVShader3 extends MVShader {
 	
 	public static final List<RenderPipeline> RENDER_PIPELINES = new ArrayList<>();
 	
-	private final RenderType layer;
+	private final RenderPipeline pipeline;
+	private final VertexFormat format;
+	private final PrimitiveTopology topology;
 	
 	public MVShader3(MVShader.Builder builder) {
 		RenderPipeline.Builder pipelineBuilder = RenderPipeline.builder(builder.getSnippets().stream()
@@ -24,24 +24,31 @@ public class MVShader3 extends MVShader {
 				.withLocation("pipeline/" + builder.getLayerName())
 				.withVertexShader("core/" + builder.getShaderName())
 				.withFragmentShader("core/" + builder.getShaderName())
-				.withVertexFormat((VertexFormat) builder.getVertexFormat().getInternalValue(),
-						(VertexFormat.Mode) builder.getDrawMode().getInternalValue());
+				.withVertexBinding(0, (VertexFormat) builder.getVertexFormat().getInternalValue())
+				.withPrimitiveTopology((PrimitiveTopology) builder.getDrawMode().getInternalValue());
 		
 		if (builder.isTranslucentBlendFunc())
 			pipelineBuilder.withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT));
-
-		RenderPipeline pipeline = RenderPipelines.register(pipelineBuilder.build());
 		
-		layer = RenderType.create(
-				builder.getLayerName(),
-				RenderSetup.builder(pipeline).affectsCrumbling().bufferSize(builder.getExpectedBufferSize()).createRenderSetup());
+		pipeline = RenderPipelines.register(pipelineBuilder.build());
+		format = (VertexFormat) builder.getVertexFormat().getInternalValue();
+		topology = (PrimitiveTopology) builder.getDrawMode().getInternalValue();
 		
 		RENDER_PIPELINES.add(pipeline);
 	}
 	
 	@Override
-	public RenderType getLayer() {
-		return layer;
+	public RenderPipeline getPipeline() {
+		return pipeline;
+	}
+	
+	@Override
+	public VertexFormat getFormat() {
+		return format;
+	}
+	
+	public PrimitiveTopology getTopology() {
+		return topology;
 	}
 	
 }

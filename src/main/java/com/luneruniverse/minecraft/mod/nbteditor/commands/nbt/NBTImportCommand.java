@@ -22,7 +22,7 @@ public class NBTImportCommand extends ClientCommand {
 	@Override
 	public void register(LiteralArgumentBuilder<FabricClientCommandSource> builder, String path) {
 		builder.executes(context -> {
-			MainUtil.client.setScreen(new ImportScreen());
+			MainUtil.client.gui.setScreen(new ImportScreen());
 			return Command.SINGLE_SUCCESS;
 		});
 	}

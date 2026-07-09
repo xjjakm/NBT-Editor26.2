@@ -1,25 +1,18 @@
 package com.luneruniverse.minecraft.mod.nbteditor.util;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.luneruniverse.minecraft.mod.nbteditor.server.ServerMVMisc;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
+
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.luneruniverse.minecraft.mod.nbteditor.server.ServerMVMisc;
-
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.level.block.state.properties.Property;
-
 public class BlockStateProperties {
 	
-	private class BlockStateProperty {
+	private static class BlockStateProperty {
 		private String value;
 		private final List<String> options;
 		public BlockStateProperty(String value, List<String> options) {
@@ -29,7 +22,7 @@ public class BlockStateProperties {
 			this.options = options;
 		}
 		public <T extends Comparable<T>> BlockStateProperty(Property<T> property, BlockState state) {
-			this(property.getName(state.getValue(property)), ServerMVMisc.getValues(property).stream().map(option -> property.getName(option)).toList());
+			this(property.getName(state.getValue(property)), ServerMVMisc.getValues(property).stream().map(property::getName).toList());
 		}
 		private void setValue(String value) {
 			if (!options.contains(value))

@@ -1,33 +1,25 @@
 package tsp.headdb.ported.inventory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map.Entry;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
-
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.core.component.DataComponents;
-import org.lwjgl.glfw.GLFW;
-
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.containers.ClientHandledScreen;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.widgets.InputOverlay;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.widgets.StringInput;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.ItemTagReferences;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
-
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.Container;
+import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.inventory.ContainerInput;
+import org.lwjgl.glfw.GLFW;
 import tsp.headdb.ported.HeadAPI;
 import tsp.headdb.ported.Utils;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 /**
  * A paged pane. Credits @ I Al Ianstaan
@@ -191,7 +183,8 @@ public class PagedPane extends ClientHandledScreen {
     
     @Override
     public void onClose() {
-    	MainUtil.client.player.closeContainer();
+    	if (MainUtil.client.player != null)
+    		MainUtil.client.player.closeContainer();
     }
 
     /**
@@ -212,7 +205,7 @@ public class PagedPane extends ClientHandledScreen {
         // create separator
         fillRow(
                 inventory.getContainerSize() / 9 - 2,
-                new ItemStack(Items.BLACK_STAINED_GLASS_PANE),
+                new ItemStack(Items.STAINED_GLASS_PANE.pick(net.minecraft.world.item.DyeColor.BLACK)),
                 inventory
         );
 
@@ -294,7 +287,7 @@ public class PagedPane extends ClientHandledScreen {
      */
     public void open() {
         reRender();
-        MainUtil.client.setScreen(this);
+        MainUtil.client.gui.setScreen(this);
     }
 
     private static class Page {

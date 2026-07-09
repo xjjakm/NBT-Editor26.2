@@ -1,5 +1,14 @@
 package com.luneruniverse.minecraft.mod.nbteditor.screens.widgets;
 
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.*;
+import com.luneruniverse.minecraft.mod.nbteditor.screens.Tickable;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import org.joml.Matrix3x2fStack;
+
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.ArrayList;
@@ -7,18 +16,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
-
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.*;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.Tickable;
-
-import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
-import net.minecraft.client.gui.components.Renderable;
-import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.narration.NarratableEntry;
-import net.minecraft.client.gui.narration.NarratableEntry.NarrationPriority;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
-import com.mojang.blaze3d.vertex.PoseStack;
-import org.joml.Matrix3x2fStack;
 
 public class GroupWidget extends AbstractContainerEventHandler implements MVDrawable, MVElement, Tickable, NarratableEntry, OldEventBehavior {
 	

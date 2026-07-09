@@ -1,15 +1,10 @@
 package com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific;
 
-import java.lang.invoke.MethodType;
-import java.util.Optional;
-import java.util.UUID;
-
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Reflection;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.general.TagReference;
 import com.mojang.authlib.GameProfile;
-
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
+
+import java.util.Optional;
 
 public class GameProfileNBTTagReference implements TagReference<Optional<GameProfile>, CompoundTag> {
 

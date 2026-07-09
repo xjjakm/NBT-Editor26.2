@@ -51,8 +51,8 @@ dependencies {
 	
 	// modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
 
-	implementation "maven.modrinth:modmenu:18.0.0-alpha.8"
-	implementation "maven.modrinth:nbt-autocomplete:1.3.15-fabric-26.1"
+	implementation "maven.modrinth:modmenu:20.0.0-beta.4"
+	implementation "maven.modrinth:nbt-autocomplete:1.3.15-fabric-26.2"
 }
 
 processResources {
@@ -72,9 +72,6 @@ java {
 	targetCompatibility = JavaVersion.VERSION_25
 }
 
-import groovy.json.JsonSlurper
-import groovy.json.JsonOutput
-
 jar {
 	inputs.property "archivesName", project.base.archivesName
 	
@@ -87,15 +84,15 @@ def getGitHash() {
 	return "git rev-parse --verify --short HEAD".execute().text.trim()
 }
 
-task mergeDevLibs(type: Jar) {
-	
-	archiveFile.set(file("${buildDir}/devlibs/nbteditor-${project.mod_version}-${getGitHash()}-dev.jar"))
+tasks.register('mergeDevLibs', Jar) {
+
+	archiveFile.set(layout.buildDirectory.file("devlibs/nbteditor-${project.mod_version}-${getGitHash()}-dev.jar"))
 }
 
-task mergeLibs(type: Jar) {
+tasks.register('mergeLibs', Jar) {
 
-	
-	archiveFile.set(file("${buildDir}/libs/nbteditor-${project.mod_version}-${getGitHash()}.jar"))
+
+	archiveFile.set(layout.buildDirectory.file("libs/nbteditor-${project.mod_version}-${getGitHash()}.jar"))
 }
 
 build.dependsOn mergeDevLibs, mergeLibs

@@ -1,9 +1,5 @@
 package com.luneruniverse.minecraft.mod.nbteditor.nbtreferences;
 
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
-
 import com.luneruniverse.minecraft.mod.nbteditor.NBTEditorClient;
 import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalBlock;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVRegistry;
@@ -16,15 +12,18 @@ import com.luneruniverse.minecraft.mod.nbteditor.packets.ViewBlockS2CPacket;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.ConfigScreen;
 import com.luneruniverse.minecraft.mod.nbteditor.util.BlockStateProperties;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
-
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 public class BlockReference implements NBTReference<LocalBlock> {
 	
@@ -32,8 +31,8 @@ public class BlockReference implements NBTReference<LocalBlock> {
 		return NBTEditorClient.SERVER_CONN
 				.sendRequest(packetFactory, ViewBlockS2CPacket.class)
 				.thenApply(optional -> optional.filter(ViewBlockS2CPacket::foundBlock)
-						.map(packet -> new BlockReference(packet.getWorld(), packet.getPos(),
-								MVRegistry.BLOCK.get(packet.getId()), packet.getState(), packet.getNbt())));
+						.map(packet -> new BlockReference(packet.world(), packet.pos(),
+								MVRegistry.BLOCK.get(packet.id()), packet.state(), packet.nbt())));
 	}
 	public static CompletableFuture<Optional<BlockReference>> getBlock(ResourceKey<Level> world, BlockPos pos) {
 		return getBlock(requestId -> new GetBlockC2SPacket(requestId, world, pos));

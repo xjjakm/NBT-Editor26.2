@@ -1,29 +1,26 @@
 package com.luneruniverse.minecraft.mod.nbteditor.multiversion.mixin;
 
-import java.lang.invoke.MethodType;
-import java.util.function.Supplier;
-
-import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
-import net.minecraft.data.registries.VanillaRegistries;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.DynamicRegistryManagerHolder;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.IdentifierInst;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVPacketByteBufParent;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Reflection;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
 import com.luneruniverse.minecraft.mod.nbteditor.server.ServerMVMisc;
-
+import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+
+import java.lang.invoke.MethodType;
+import java.util.function.Supplier;
 
 @Mixin(FriendlyByteBuf.class)
 public abstract class FriendlyByteBufMixin implements MVPacketByteBufParent {

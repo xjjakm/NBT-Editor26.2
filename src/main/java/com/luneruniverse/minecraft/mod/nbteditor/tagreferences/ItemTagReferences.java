@@ -1,47 +1,30 @@
 package com.luneruniverse.minecraft.mod.nbteditor.tagreferences;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVComponentType;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Reflection;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.general.ComponentTagReference;
-import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.general.NBTTagReference;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.general.TagReference;
-import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific.AttributesNBTTagReference;
-import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific.CustomDataNBTTagReference;
-import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific.CustomPotionContentsNBTTagReference;
-import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific.EnchantsTagReference;
-import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific.GameProfileNBTTagReference;
-import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific.GameProfileNameNBTTagReference;
+import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific.*;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific.data.AttributeData;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific.data.CustomPotionContents;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific.data.Enchants;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific.data.hideflags.HideFlag;
-import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific.hideflags.HideFlagsNBTTagReference;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific.hideflags.HideFlagsTooltipDisplayComponentTagReference;
 import com.mojang.authlib.GameProfile;
-
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.item.component.ItemAttributeModifiers;
-import net.minecraft.world.item.component.BlockItemStateProperties;
-import net.minecraft.world.item.component.ItemLore;
-import net.minecraft.world.item.component.CustomData;
-import net.minecraft.world.item.component.ResolvableProfile;
-import net.minecraft.world.item.component.WritableBookContent;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.component.TypedEntityData;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.server.network.Filterable;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.network.Filterable;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.*;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.BlockEntityTypes;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ItemTagReferences {
 	
@@ -49,18 +32,18 @@ public class ItemTagReferences {
 		return new ComponentTagReference<>(component,
 				null,
 				componentValue -> componentValue == null ? new CompoundTag() : componentValue.copyTag(),
-				r-> CustomData.of(r));
+                CustomData::of);
 	}
 	private static TagReference<TypedEntityData<EntityType<?>>, ItemStack> getComponentTagRefOfEntityData() {
 		return new ComponentTagReference<>(MVComponentType.ENTITY_DATA,
 				null,
-				componentValue -> componentValue == null ? TypedEntityData.of(EntityType.BAT,new CompoundTag()) : componentValue,
+				componentValue -> componentValue == null ? TypedEntityData.of(EntityTypes.BAT,new CompoundTag()) : componentValue,
 				r-> r);
 	}
 	private static TagReference<TypedEntityData<BlockEntityType<?>>, ItemStack> getComponentTagRefOfBlockEntityData() {
 		return new ComponentTagReference<>(MVComponentType.BLOCK_ENTITY_DATA,
 				null,
-				componentValue -> componentValue == null ? TypedEntityData.of(BlockEntityType.COMMAND_BLOCK,new CompoundTag()) : componentValue,
+				componentValue -> componentValue == null ? TypedEntityData.of(BlockEntityTypes.COMMAND_BLOCK,new CompoundTag()) : componentValue,
 				r-> r);
 	}
 
@@ -111,7 +94,7 @@ public class ItemTagReferences {
 	
 	public static final TagReference<CompoundTag, ItemStack> CUSTOM_DATA = Version.<TagReference<CompoundTag, ItemStack>>newSwitch()
 			.range("1.20.5", null, () -> getComponentTagRefOfNBT(MVComponentType.CUSTOM_DATA))
-			.range(null, "1.20.4", () -> new CustomDataNBTTagReference())
+			.range(null, "1.20.4", CustomDataNBTTagReference::new)
 			.get();
 	
 	public static final TagReference<Map<String, String>, ItemStack> BLOCK_STATE = Version.<TagReference<Map<String, String>, ItemStack>>newSwitch()
@@ -135,7 +118,7 @@ public class ItemTagReferences {
 			.get();
 	
 	public static final TagReference<Map<HideFlag, Boolean>, ItemStack> HIDE_FLAGS = Version.<TagReference<Map<HideFlag, Boolean>, ItemStack>>newSwitch()
-			.range("1.21.5", null, () -> new HideFlagsTooltipDisplayComponentTagReference())
+			.range("1.21.5", null, HideFlagsTooltipDisplayComponentTagReference::new)
 			.get();
 	
 }

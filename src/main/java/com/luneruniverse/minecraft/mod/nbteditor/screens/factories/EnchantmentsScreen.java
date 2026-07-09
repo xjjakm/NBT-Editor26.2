@@ -1,33 +1,25 @@
 package com.luneruniverse.minecraft.mod.nbteditor.screens.factories;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalItem;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVRegistry;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
 import com.luneruniverse.minecraft.mod.nbteditor.nbtreferences.itemreferences.ItemReference;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.LocalEditorScreen;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.ConfigCategory;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.ConfigItem;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.ConfigList;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.ConfigPanel;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.ConfigPath;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.ConfigValueDropdown;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.ConfigValueNumber;
+import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.*;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.ItemTagReferences;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific.data.Enchants;
-
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
 import org.joml.Matrix3x2fStack;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class EnchantmentsScreen extends LocalEditorScreen<LocalItem> {
 	
@@ -78,7 +70,7 @@ public class EnchantmentsScreen extends LocalEditorScreen<LocalItem> {
 								.get())));
 		config = new ConfigList(TextInst.translatable("nbteditor.enchantments"), false, entry);
 
-		ItemTagReferences.ENCHANTMENTS.get(localNBT.getEditableItem()).getEnchants().forEach(enchant -> {
+		ItemTagReferences.ENCHANTMENTS.get(localNBT.getEditableItem()).enchants().forEach(enchant -> {
 			ConfigCategory enchantConfig = entry.clone(true);
 			Identifier id = null;
 			for(Holder<Enchantment> e : registry.getInternalValue().asHolderIdMap()) {

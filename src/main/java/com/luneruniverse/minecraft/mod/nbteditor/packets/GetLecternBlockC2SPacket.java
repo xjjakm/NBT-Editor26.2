@@ -6,31 +6,23 @@ import com.luneruniverse.minecraft.mod.nbteditor.multiversion.networking.MVPacke
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.Identifier;
 
-public class GetLecternBlockC2SPacket implements MVPacket {
-	
+public record GetLecternBlockC2SPacket(int requestId) implements MVPacket {
+
 	public static final Identifier ID = IdentifierInst.of("nbteditor", "get_lectern_block");
-	
-	private final int requestId;
-	
-	public GetLecternBlockC2SPacket(int requestId) {
-		this.requestId = requestId;
-	}
+
 	public GetLecternBlockC2SPacket(FriendlyByteBuf payload) {
-		this.requestId = payload.readVarInt();
+		this(payload.readVarInt());
 	}
-	
-	public int getRequestId() {
-		return requestId;
-	}
-	
+
+
 	@Override
 	public void write(FriendlyByteBuf payload) {
 		payload.writeVarInt(requestId);
 	}
-	
+
 	@Override
 	public Identifier getPacketId() {
 		return ID;
 	}
-	
+
 }

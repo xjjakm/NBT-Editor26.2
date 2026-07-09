@@ -9,11 +9,6 @@ import net.minecraft.client.gui.screens.Screen;
 public class NBTEditorModMenuApi implements ModMenuApi {
 	@Override
 	public ConfigScreenFactory<?> getModConfigScreenFactory() {
-		return new ConfigScreenFactory<Screen>() {
-			@Override
-			public Screen create(Screen parent) {
-				return new ConfigScreen(parent);
-			}
-		};
+		return (ConfigScreenFactory<Screen>) parent -> new ConfigScreen(parent);
 	}
 }

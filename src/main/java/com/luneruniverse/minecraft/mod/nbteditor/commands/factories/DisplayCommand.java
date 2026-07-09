@@ -1,7 +1,5 @@
 package com.luneruniverse.minecraft.mod.nbteditor.commands.factories;
 
-import java.util.List;
-
 import com.luneruniverse.minecraft.mod.nbteditor.commands.ClientCommandGroup;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.FabricClientCommandSource;
 import com.luneruniverse.minecraft.mod.nbteditor.nbtreferences.NBTReference;
@@ -10,6 +8,8 @@ import com.luneruniverse.minecraft.mod.nbteditor.screens.factories.DisplayScreen
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+
+import java.util.List;
 
 public class DisplayCommand extends ClientCommandGroup {
 	
@@ -40,7 +40,7 @@ public class DisplayCommand extends ClientCommandGroup {
 		super.register(builder, path);
 		builder.executes(context -> {
 			NBTReference.getReference(NBTReferenceFilter.ANY_NBT, false,
-					ref -> MainUtil.client.setScreen(new DisplayScreen<>(ref)));
+					ref -> MainUtil.client.gui.setScreen(new DisplayScreen<>(ref)));
 			return Command.SINGLE_SUCCESS;
 		});
 	}

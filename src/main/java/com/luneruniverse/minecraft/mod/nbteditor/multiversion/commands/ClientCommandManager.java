@@ -16,27 +16,18 @@
 
 package com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands;
 
-import java.lang.invoke.MethodType;
-import java.util.function.Supplier;
-
-import org.jetbrains.annotations.Nullable;
-
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Reflection;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.multiplayer.ClientCommonPacketListenerImpl;
-import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.network.protocol.game.ClientboundCommandsPacket;
 import net.minecraft.network.protocol.game.ClientboundLoginPacket;
-import net.minecraft.core.RegistryAccess;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Manages client-sided commands and provides some related helper methods.

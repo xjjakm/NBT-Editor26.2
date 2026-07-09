@@ -1,25 +1,24 @@
 package com.luneruniverse.minecraft.mod.nbteditor.server;
 
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Reflection;
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.Permission;
+import net.minecraft.server.permissions.PermissionLevel;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.ContainerEntity;
+import net.minecraft.world.entity.vehicle.minecart.AbstractMinecartContainer;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.properties.Property;
+
 import java.lang.invoke.MethodType;
 import java.util.Collection;
 import java.util.function.Supplier;
-
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Reflection;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
-
-import net.minecraft.server.permissions.Permission;
-import net.minecraft.server.permissions.PermissionLevel;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.vehicle.ContainerEntity;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.world.MenuProvider;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.vehicle.minecart.AbstractMinecartContainer;
-import net.minecraft.world.level.block.state.properties.Property;
-import net.minecraft.world.level.Level;
 
 public class ServerMVMisc {
 	
@@ -79,7 +78,7 @@ public class ServerMVMisc {
 			Reflection.getOptionalMethod(Property.class, "method_11898", MethodType.methodType(Collection.class));
 	public static <T extends Comparable<T>> Collection<T> getValues(Property<T> property) {
 		return Version.<Collection<T>>newSwitch()
-				.range("1.21.2", null, () -> property.getPossibleValues())
+				.range("1.21.2", null, property::getPossibleValues)
 				.range(null, "1.21.1", () -> Property_getValues.get().invoke(property))
 				.get();
 	}

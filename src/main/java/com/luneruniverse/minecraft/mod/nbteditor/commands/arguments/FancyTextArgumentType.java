@@ -1,11 +1,6 @@
 // TODO(Ravel): Failed to fully resolve file: null cannot be cast to non-null type com.intellij.psi.PsiJavaCodeReferenceElement
 package com.luneruniverse.minecraft.mod.nbteditor.commands.arguments;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
-
 import com.luneruniverse.minecraft.mod.nbteditor.fancytext.FancyText;
 import com.luneruniverse.minecraft.mod.nbteditor.fancytext.StyleOption;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
@@ -19,10 +14,15 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-
-import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 public class FancyTextArgumentType implements ArgumentType<Component> {
 	
@@ -59,7 +59,8 @@ public class FancyTextArgumentType implements ArgumentType<Component> {
 		
 		Map.Entry<String, Boolean> output = FancyText.stringify(text, base);
 		if (output.getValue() && printErrors)
-			MainUtil.client.player.sendSystemMessage(TextInst.translatable("nbteditor.fancy_text_arg_type.stringify_unsupported"));
+			if (MainUtil.client.player != null)
+				MainUtil.client.player.sendSystemMessage(TextInst.translatable("nbteditor.fancy_text_arg_type.stringify_unsupported"));
 		return output.getKey();
 	}
 	
@@ -98,7 +99,7 @@ public class FancyTextArgumentType implements ArgumentType<Component> {
 		if (lastColor == lastIndex || StyleUtil.SHADOW_COLOR_EXISTS && lastColor == lastShadowColor - 1 && lastShadowColor == lastIndex) {
 			builder = builder.createOffset(builder.getStart() + lastIndex + 1);
 			for (ChatFormatting format : ChatFormatting.values())
-				builder.suggest(format.getChar() + "", () -> format.getName());
+				builder.suggest(format.toString().charAt(1) + "", () -> format.name().toLowerCase(Locale.ROOT));
 			builder.suggest("#", TextInst.translatable("nbteditor.fancy_text_arg_type.custom_color"));
 			if (StyleUtil.SHADOW_COLOR_EXISTS && lastColor == lastIndex)
 				builder.suggest("_", TextInst.translatable("nbteditor.fancy_text_arg_type.shadow_color"));

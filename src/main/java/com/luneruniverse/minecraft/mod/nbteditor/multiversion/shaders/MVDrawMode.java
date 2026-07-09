@@ -1,7 +1,6 @@
 package com.luneruniverse.minecraft.mod.nbteditor.multiversion.shaders;
 
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Reflection;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
+import com.mojang.blaze3d.PrimitiveTopology;
 
 public enum MVDrawMode {
 	LINES,
@@ -15,12 +14,10 @@ public enum MVDrawMode {
 	
 	private final Object value;
 	
-	@SuppressWarnings("unchecked")
-	private <T extends Enum<T>> MVDrawMode() {
-		value = Enum.valueOf((Class<T>) Reflection.getClass(Version.<String>newSwitch()
-				.range("1.21.5", null, "com.mojang.blaze3d.vertex.VertexFormat$class_5596")
-				.range(null, "1.21.4", "net.minecraft.class_293$class_5596")
-				.get()), name());
+	MVDrawMode() {
+		// 26.2+: VertexFormat.Mode was replaced by PrimitiveTopology
+		// PrimitiveTopology has no LINE_STRIP (ordinal 1); fall back to DEBUG_LINE_STRIP
+		value = (ordinal() == 1) ? PrimitiveTopology.DEBUG_LINE_STRIP : PrimitiveTopology.valueOf(name());
 	}
 	
 	public Object getInternalValue() {

@@ -1,10 +1,5 @@
 package tsp.headdb.ported.inventory;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.containers.ClientHandledScreen;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.widgets.InputOverlay;
@@ -12,18 +7,18 @@ import com.luneruniverse.minecraft.mod.nbteditor.screens.widgets.StringInput;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.ItemTagReferences;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific.data.hideflags.HideFlag;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
-
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.Container;
+import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.inventory.ContainerInput;
-import tsp.headdb.ported.Category;
-import tsp.headdb.ported.Head;
-import tsp.headdb.ported.HeadAPI;
-import tsp.headdb.ported.LocalHead;
-import tsp.headdb.ported.Utils;
+import tsp.headdb.ported.*;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class InventoryUtils {
 
@@ -182,7 +177,8 @@ public class InventoryUtils {
     		}
     		@Override
     		public void onClose() {
-    			MainUtil.client.player.closeContainer();
+    			if (MainUtil.client.player != null)
+    				MainUtil.client.player.closeContainer();
     		}
     	};
         Container inventory = screen.getMenu().getContainer();
@@ -195,39 +191,33 @@ public class InventoryUtils {
             inventory.setItem(getUILocation(category.getName(), category.getLocation()), item);
         }
 
-        if (true) {
-            inventory.setItem(getUILocation("favorites", 39), buildButton(
-                getUIItem("favorites", new ItemStack(Items.BOOK)),
-                "&eFavorites",
-                "",
-                "&8Click to view your favorites")
-            );
-        }
+        inventory.setItem(getUILocation("favorites", 39), buildButton(
+            getUIItem("favorites", new ItemStack(Items.BOOK)),
+            "&eFavorites",
+            "",
+            "&8Click to view your favorites")
+        );
 
-        if (true) {
-            inventory.setItem(getUILocation("search", 40), buildButton(
-                getUIItem("search", new ItemStack(Items.DARK_OAK_SIGN)),
-                "&9Search",
-                "",
-                "&8Click to open search menu"
-            ));
-        }
+        inventory.setItem(getUILocation("search", 40), buildButton(
+            getUIItem("search", new ItemStack(Items.DARK_OAK_SIGN)),
+            "&9Search",
+            "",
+            "&8Click to open search menu")
+        );
 
-        if (true) {
-            inventory.setItem(getUILocation("local", 41), buildButton(
-                getUIItem("local", new ItemStack(Items.COMPASS)),
-                "&aLocal",
-                "",
-                "&8Online Players"
-            ));
-        }
+        inventory.setItem(getUILocation("local", 41), buildButton(
+            getUIItem("local", new ItemStack(Items.COMPASS)),
+            "&aLocal",
+            "",
+            "&8Online Players")
+        );
 
         fill(inventory);
-        MainUtil.client.setScreen(screen);
+        MainUtil.client.gui.setScreen(screen);
     }
 
     public static void fill(Container inv) {
-        ItemStack item = getUIItem("fill", new ItemStack(Items.BLACK_STAINED_GLASS_PANE));
+        ItemStack item = getUIItem("fill", new ItemStack(Items.STAINED_GLASS_PANE.pick(net.minecraft.world.item.DyeColor.BLACK)));
         // Do not bother filling the inventory if item to fill it with is AIR.
         if (item == null || item.isEmpty()) return;
         

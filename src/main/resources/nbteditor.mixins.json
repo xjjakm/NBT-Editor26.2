@@ -12,7 +12,6 @@
     "SynchedEntityDataMixin"
   ],
   "client": [
-    "RegistryEntryMixin",
     "AbstractContainerMenuMixin",
     "AbstractContainerScreenAccessor",
     "AbstractContainerScreenMixin",
@@ -26,6 +25,7 @@
     "CreativeModeInventoryScreenMixin",
     "EditBoxMixin",
     "EnchantmentMixin",
+    "GuiMixin",
     "IdMapMixin",
     "ItemStackMixin",
     "KeyboardHandlerMixin",
@@ -33,6 +33,7 @@
     "LocalPlayerMixin",
     "MinecraftMixin",
     "NativeImageMixin",
+    "RegistryEntryMixin",
     "ScreenMixin",
     "ScreenshotMixin",
     "StringTagVisitorAccessor",

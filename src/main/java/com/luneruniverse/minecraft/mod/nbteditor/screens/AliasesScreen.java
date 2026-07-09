@@ -1,26 +1,19 @@
 package com.luneruniverse.minecraft.mod.nbteditor.screens;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import com.luneruniverse.minecraft.mod.nbteditor.commands.ClientCommand;
 import com.luneruniverse.minecraft.mod.nbteditor.commands.ClientCommandGroup;
 import com.luneruniverse.minecraft.mod.nbteditor.commands.CommandHandler;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.*;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.ClientCommandManager;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.ConfigScreen.Alias;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.ConfigBar;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.ConfigItem;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.ConfigList;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.ConfigPanel;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.ConfigPath;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.ConfigValueText;
-
+import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.*;
 import net.minecraft.client.gui.screens.Screen;
-import com.mojang.blaze3d.vertex.PoseStack;
 import org.joml.Matrix3x2fStack;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class AliasesScreen extends TickableSupportingScreen {
 	
@@ -78,13 +71,13 @@ public class AliasesScreen extends TickableSupportingScreen {
 			newPanel.setScroll(panel.getScroll());
 		panel = newPanel;
 		
-		this.addRenderableWidget(MVMisc.newButton(this.width - 134, this.height - 36, 100, 20, ScreenTexts.DONE, btn -> onClose()));
-		this.addRenderableWidget(MVMisc.newButton(this.width - 134, this.height - 36 - 24, 100, 20, ScreenTexts.CANCEL, btn -> {
+		this.addRenderableWidget(MVMisc.newButton(this.width - 134, this.height - 36, 100, 20, ScreenTexts.DONE, _ -> onClose()));
+		this.addRenderableWidget(MVMisc.newButton(this.width - 134, this.height - 36 - 24, 100, 20, ScreenTexts.CANCEL, _ -> {
 			cancel = true;
 			onClose();
 		}));
 		this.addRenderableWidget(MVMisc.newButton(this.width - 134, this.height - 36 - 24 * 2, 100, 20,
-				TextInst.translatable("nbteditor.config.aliases.extreme"), btn -> addExtremeAliases(CommandHandler.COMMANDS.values(), ""),
+				TextInst.translatable("nbteditor.config.aliases.extreme"), _ -> addExtremeAliases(CommandHandler.COMMANDS.values(), ""),
 				new MVTooltip("nbteditor.config.aliases.extreme.desc")));
 	}
 	
@@ -94,7 +87,7 @@ public class AliasesScreen extends TickableSupportingScreen {
 	}
 	
 	public void onClose() {
-		minecraft.setScreen(this.parent);
+		minecraft.gui.setScreen(this.parent);
 	}
 	
 	@Override

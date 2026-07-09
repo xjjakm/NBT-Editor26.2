@@ -1,20 +1,17 @@
 package com.luneruniverse.minecraft.mod.nbteditor.multiversion;
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
-import net.minecraft.client.input.MouseButtonEvent;
-import org.joml.Matrix3x2fStack;
-import org.lwjgl.glfw.GLFW;
-
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractSliderButton;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
+import org.joml.Matrix3x2fStack;
+import org.lwjgl.glfw.GLFW;
+
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class MVSliderWidget extends MVButtonWidget {
 	

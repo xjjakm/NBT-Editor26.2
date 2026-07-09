@@ -5,12 +5,11 @@ import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.networking.MVClientNetworking;
 import com.luneruniverse.minecraft.mod.nbteditor.packets.SetCursorC2SPacket;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
-
-import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
 
 public class CursorManager {
 	
@@ -44,7 +43,9 @@ public class CursorManager {
 	public void onHandledScreenSet(AbstractContainerScreen<?> screen) {
 		if (screen == currentBranch)
 			return;
-		
+		if (MainUtil.client.player == null)
+			return;
+
 		currentRoot = screen;
 		currentRootIsInventory = (currentRoot.getMenu() == MainUtil.client.player.inventoryMenu ||
 				currentRoot instanceof CreativeModeInventoryScreen);
@@ -79,6 +80,8 @@ public class CursorManager {
 	}
 	
 	public void showBranch(AbstractContainerScreen<?> branch) {
+		if (MainUtil.client.player == null)
+			return;
 		if (currentRoot == null) {
 			if (MVMisc.hasCreativeInventory()) {
 				currentRoot = MVMisc.newCreativeModeInventoryScreen(MainUtil.client.player);
@@ -103,7 +106,7 @@ public class CursorManager {
 		currentBranch = branch;
 		MainUtil.client.player.containerMenu = branch.getMenu();
 		branch.skipNextRelease = true;
-		MainUtil.client.setScreen(branch);
+		MainUtil.client.gui.setScreen(branch);
 	}
 	public void showRoot() {
 		showBranch(currentRoot);
@@ -111,10 +114,12 @@ public class CursorManager {
 	
 	public void closeRoot() {
 		if (currentRoot == null) {
-			MainUtil.client.setScreen(null);
+			MainUtil.client.gui.setScreen(null);
 			return;
 		}
-		
+		if (MainUtil.client.player == null)
+			return;
+
 		if (currentRootClosed) {
 			if (currentBranch != currentRoot) {
 				ItemStack cursor = currentBranch.getMenu().getCarried();

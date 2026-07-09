@@ -1,20 +1,10 @@
 package com.luneruniverse.minecraft.mod.nbteditor.screens.containers;
 
-import java.util.function.Function;
-
 import com.luneruniverse.minecraft.mod.nbteditor.NBTEditor;
-import org.joml.Matrix3x2fStack;
-import org.lwjgl.glfw.GLFW;
-
 import com.luneruniverse.minecraft.mod.nbteditor.NBTEditorClient;
 import com.luneruniverse.minecraft.mod.nbteditor.commands.get.GetLostItemCommand;
 import com.luneruniverse.minecraft.mod.nbteditor.containers.ContainerIOs;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.IdentifierInst;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.IgnoreCloseScreenPacket;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVDrawableHelper;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.OldEventBehavior;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.*;
 import com.luneruniverse.minecraft.mod.nbteditor.nbtreferences.itemreferences.InventoryItemReference;
 import com.luneruniverse.minecraft.mod.nbteditor.nbtreferences.itemreferences.ItemReference;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.ConfigScreen;
@@ -23,18 +13,19 @@ import com.luneruniverse.minecraft.mod.nbteditor.screens.factories.LocalFactoryS
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.ItemTagReferences;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific.data.Enchants;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
-
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import org.joml.Matrix3x2fStack;
+import org.lwjgl.glfw.GLFW;
+
+import java.util.function.Function;
 
 import static com.luneruniverse.minecraft.mod.nbteditor.NBTEditor.hasControlDown;
 import static com.luneruniverse.minecraft.mod.nbteditor.NBTEditor.hasShiftDown;
@@ -74,9 +65,9 @@ public class ClientHandledScreen extends ContainerScreen implements OldEventBeha
 				com.luneruniverse.minecraft.mod.nbteditor.screens.containers.ContainerScreen.show(ref);
 		} else if (hasShiftDown()) {
 			if (notAir)
-				MainUtil.client.setScreen(new LocalFactoryScreen<>(ref));
+				MainUtil.client.gui.setScreen(new LocalFactoryScreen<>(ref));
 		} else
-			MainUtil.client.setScreen(new NBTEditorScreen<>(ref));
+			MainUtil.client.gui.setScreen(new NBTEditorScreen<>(ref));
 		
 		return true;
 	}
@@ -256,7 +247,7 @@ public class ClientHandledScreen extends ContainerScreen implements OldEventBeha
 				}
 				
 				Enchants enchants = ItemTagReferences.ENCHANTMENTS.get(item);
-				enchants.addEnchants(ItemTagReferences.ENCHANTMENTS.get(cursor).getEnchants());
+				enchants.addEnchants(ItemTagReferences.ENCHANTMENTS.get(cursor).enchants());
 				ItemTagReferences.ENCHANTMENTS.set(item, enchants);
 				
 				slot.set(item);

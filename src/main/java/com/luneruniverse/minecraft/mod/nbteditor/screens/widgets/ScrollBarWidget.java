@@ -1,16 +1,14 @@
 package com.luneruniverse.minecraft.mod.nbteditor.screens.widgets;
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVDrawable;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVDrawableHelper;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVElement;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.ConfigScreen;
-
 import net.minecraft.client.input.MouseButtonEvent;
-import com.mojang.blaze3d.vertex.PoseStack;
 import org.joml.Matrix3x2fStack;
+
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class ScrollBarWidget implements MVDrawable, MVElement {
 	

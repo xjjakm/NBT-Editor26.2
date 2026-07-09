@@ -77,7 +77,7 @@ public class NBTEditor implements ModInitializer {
 		MVNetworking.registerPacket(SetEntityC2SPacket.ID, SetEntityC2SPacket::new);
 		MVNetworking.registerPacket(SetSlotC2SPacket.ID, SetSlotC2SPacket::new);
 		MVNetworking.registerPacket(SummonEntityC2SPacket.ID, SummonEntityC2SPacket::new);
-		MVNetworking.registerPacket(ViewBlockS2CPacket.ID, ViewBlockS2CPacket::new);
+		MVNetworking.registerPacket(ViewBlockS2CPacket.ID, ViewBlockS2CPacket::read);
 		MVNetworking.registerPacket(ViewEntityS2CPacket.ID, ViewEntityS2CPacket::new);
 		
 		SERVER = new NBTEditorServer();

@@ -1,30 +1,13 @@
 package com.luneruniverse.minecraft.mod.nbteditor.misc;
 
-import java.awt.Color;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.OptionalLong;
-import java.util.Random;
-import java.util.Set;
-import java.util.WeakHashMap;
-
-import org.joml.Matrix3x2fStack;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.luneruniverse.minecraft.mod.nbteditor.NBTEditorClient;
 import com.luneruniverse.minecraft.mod.nbteditor.async.ItemSize;
 import com.luneruniverse.minecraft.mod.nbteditor.commands.get.GetLostItemCommand;
 import com.luneruniverse.minecraft.mod.nbteditor.containers.ContainerIOs;
-import com.luneruniverse.minecraft.mod.nbteditor.mixin.ChatScreenAccessor;
 import com.luneruniverse.minecraft.mod.nbteditor.mixin.AbstractContainerScreenAccessor;
+import com.luneruniverse.minecraft.mod.nbteditor.mixin.ChatScreenAccessor;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVDrawableHelper;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVTextEvents;
@@ -38,28 +21,33 @@ import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific.data.hid
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.ChatScreen;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.BookViewScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.gui.components.EditBox;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.nbt.Tag;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.inventory.ContainerInput;
-import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextColor;
-import net.minecraft.ChatFormatting;
+import org.joml.Matrix3x2fStack;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.awt.*;
+import java.io.File;
+import java.util.*;
+import java.util.List;
 
 // Non-mixin classes in the mixin package doesn't work well
 public class MixinLink {
@@ -204,7 +192,7 @@ public class MixinLink {
 				}
 				
 				Enchants enchants = ItemTagReferences.ENCHANTMENTS.get(item);
-				enchants.addEnchants(ItemTagReferences.ENCHANTMENTS.get(cursor).getEnchants());
+				enchants.addEnchants(ItemTagReferences.ENCHANTMENTS.get(cursor).enchants());
 				ItemTagReferences.ENCHANTMENTS.set(item, enchants);
 				
 				ItemReference.getContainerItem(source, slot).saveItem(item);
@@ -309,7 +297,7 @@ public class MixinLink {
 			// Checking slots in your hotbar vs item selection is difficult, so the lore is just disabled in non-inventory tabs
 			boolean creativeInv = MVMisc.isCreativeInventoryTabSelected();
 			
-			if (creativeInv || (!(MainUtil.client.screen instanceof CreativeModeInventoryScreen) &&
+			if (creativeInv || (!(MainUtil.client.gui.screen() instanceof CreativeModeInventoryScreen) &&
 					NBTEditorClient.SERVER_CONN.isScreenEditable())) {
 				tooltip.add(TextInst.translatable("nbteditor.keybind.edit"));
 				tooltip.add(TextInst.translatable("nbteditor.keybind.factory"));

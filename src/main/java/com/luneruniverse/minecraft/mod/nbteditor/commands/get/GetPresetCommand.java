@@ -1,12 +1,5 @@
 package com.luneruniverse.minecraft.mod.nbteditor.commands.get;
 
-import static com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.ClientCommandManager.literal;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Supplier;
-
 import com.luneruniverse.minecraft.mod.nbteditor.NBTEditor;
 import com.luneruniverse.minecraft.mod.nbteditor.commands.ClientCommand;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.IdentifierInst;
@@ -17,11 +10,17 @@ import com.luneruniverse.minecraft.mod.nbteditor.multiversion.nbt.manager.NBTMan
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Supplier;
+
+import static com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.ClientCommandManager.literal;
 
 public class GetPresetCommand extends ClientCommand {
 	
@@ -62,12 +61,10 @@ public class GetPresetCommand extends ClientCommand {
 	
 	@Override
 	public void register(LiteralArgumentBuilder<FabricClientCommandSource> builder, String path) {
-		presetItems.forEach((name, item) -> {
-			builder.then(literal(name).executes(context -> {
-				MainUtil.getWithMessage(item.get().copy());
-				return Command.SINGLE_SUCCESS;
-			}));
-		});
+		presetItems.forEach((name, item) -> builder.then(literal(name).executes(context -> {
+            MainUtil.getWithMessage(item.get().copy());
+            return Command.SINGLE_SUCCESS;
+        })));
 	}
 	
 }

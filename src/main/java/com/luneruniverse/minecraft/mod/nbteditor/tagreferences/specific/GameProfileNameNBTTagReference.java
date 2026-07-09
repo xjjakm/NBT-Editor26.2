@@ -1,11 +1,9 @@
 package com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific;
 
-import java.util.Optional;
-
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.general.TagReference;
-
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
+
+import java.util.Optional;
 
 public class GameProfileNameNBTTagReference implements TagReference<Optional<String>, CompoundTag> {
 

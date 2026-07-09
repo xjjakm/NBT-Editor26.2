@@ -16,21 +16,12 @@
 
 package com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.mixin;
 
-import org.objectweb.asm.Opcodes;
+import com.mojang.brigadier.CommandDispatcher;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Desc;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.CommandRegistrationCallback;
-import com.mojang.brigadier.CommandDispatcher;
-
-import net.minecraft.commands.Commands;
-import net.minecraft.commands.Commands.CommandSelection;
-import net.minecraft.commands.CommandSourceStack;
 
 @Mixin(value = Commands.class)
 public abstract class CommandsMixin {

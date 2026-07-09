@@ -1,13 +1,8 @@
 package com.luneruniverse.minecraft.mod.nbteditor.screens.factories;
 
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalEntity;
 import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalItem;
 import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalNBT;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVComponentType;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.nbt.manager.NBTManagers;
@@ -20,10 +15,13 @@ import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.EntityTagReferenc
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.ItemTagReferences;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
 import com.luneruniverse.minecraft.mod.nbteditor.util.StyleUtil;
-
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import org.joml.Matrix3x2fStack;
+
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DisplayScreen<L extends LocalNBT> extends LocalEditorScreen<L> {
 	
@@ -64,7 +62,7 @@ public class DisplayScreen<L extends LocalNBT> extends LocalEditorScreen<L> {
 			addWidget(nameFormatted);
 			addWidget(lore);
 			addRenderableWidget(MVMisc.newButton(16, height - 16 - 20, 100, 20, TextInst.translatable("nbteditor.hide_flags"),
-					btn -> closeSafely(() -> minecraft.setScreen(new HideFlagsScreen((ItemReference) ref)))));
+					_ -> closeSafely(() -> minecraft.gui.setScreen(new HideFlagsScreen((ItemReference) ref)))));
 			if (NBTManagers.COMPONENTS_EXIST) {
 				addRenderableWidget(MVMisc.newButton(124, height - 16 - 20, 150, 20,
 						TextInst.translatable("nbteditor.display.name_type." + (itemNameType ? "item" : "custom")), btn -> {

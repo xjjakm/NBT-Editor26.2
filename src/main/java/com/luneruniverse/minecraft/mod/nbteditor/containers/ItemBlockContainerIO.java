@@ -2,23 +2,18 @@ package com.luneruniverse.minecraft.mod.nbteditor.containers;
 
 import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalBlock;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
-
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 public record ItemBlockContainerIO(ContainerIO<ItemStack> item, ContainerIO<LocalBlock> block) {
 	
 	public static ItemBlockContainerIO forSlotKeyItems(int numSlots) {
 		return Version.<ItemBlockContainerIO>newSwitch()
-				.range("1.20.5", null, () -> {
-					return new ItemBlockContainerIO(
-							new ContainerComponentContainerIO(numSlots),
-							ContainerIO.forLocalNBT(new SlotKeyNbtListContainerIO(numSlots).forNbtCompoundItems()));
-				})
+				.range("1.20.5", null, () -> new ItemBlockContainerIO(
+                        new ContainerComponentContainerIO(numSlots),
+                        ContainerIO.forLocalNBT(new SlotKeyNbtListContainerIO(numSlots).forNbtCompoundItems())))
 				.get();
 	}
 	

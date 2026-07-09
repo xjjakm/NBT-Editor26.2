@@ -1,31 +1,22 @@
 package com.luneruniverse.minecraft.mod.nbteditor.screens;
 
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-
-import net.minecraft.client.input.KeyEvent;
-import org.joml.Matrix3x2fStack;
-import org.lwjgl.glfw.GLFW;
-
 import com.luneruniverse.minecraft.mod.nbteditor.NBTEditorClient;
 import com.luneruniverse.minecraft.mod.nbteditor.clientchest.ClientChest;
 import com.luneruniverse.minecraft.mod.nbteditor.clientchest.ClientChestHelper;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.DataVersionStatus;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.EditableText;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVDrawableHelper;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVTooltip;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.*;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.containers.ClientChestScreen;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.util.FancyConfirmScreen;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.widgets.NamedTextFieldWidget;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
-
-import net.minecraft.client.gui.components.Button;
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.network.chat.Component;
+import org.joml.Matrix3x2fStack;
+import org.lwjgl.glfw.GLFW;
+
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 public class ClientChestDataVersionScreen extends TickableSupportingScreen {
 	
@@ -47,7 +38,7 @@ public class ClientChestDataVersionScreen extends TickableSupportingScreen {
 					default -> throw new IllegalArgumentException("Unexpected DataVersionStatus: " + dataVersionStatus);
 				},
 				ClientChestScreen.PAGE + 1,
-				dataVersion.flatMap(Version::getMCVersion).or(() -> dataVersion.map(value -> value.toString())).orElse(""));
+				dataVersion.flatMap(Version::getMCVersion).or(() -> dataVersion.map(Object::toString)).orElse(""));
 	}
 	
 	@Override
@@ -63,77 +54,65 @@ public class ClientChestDataVersionScreen extends TickableSupportingScreen {
 		int dontUpdatePageX = width / 2 + (dataVersionStatus == DataVersionStatus.TOO_UPDATED ? -50 : 58);
 		
 		addRenderableWidget(MVMisc.newButton(dontUpdatePageX, height / 2 - 34, 52, 20,
-				TextInst.translatable("nbteditor.client_chest.data_version.dont_update_page"), btn -> onClose()));
-		addRenderableWidget(MVMisc.newButton(dontUpdatePageX + 56, height / 2 - 34, 20, 20, TextInst.of("<"), btn -> prevPage(),
+				TextInst.translatable("nbteditor.client_chest.data_version.dont_update_page"), _ -> onClose()));
+		addRenderableWidget(MVMisc.newButton(dontUpdatePageX + 56, height / 2 - 34, 20, 20, TextInst.of("<"), _ -> prevPage(),
 				ConfigScreen.isKeybindsHidden() ? null : new MVTooltip(TextInst.literal("")
 						.append(prevKeybind).append(TextInst.translatable("nbteditor.keybind.page.prev")))))
 				.active = ClientChestScreen.PAGE > 0;
-		addRenderableWidget(MVMisc.newButton(dontUpdatePageX + 80, height / 2 - 34, 20, 20, TextInst.of(">"), btn -> nextPage(),
+		addRenderableWidget(MVMisc.newButton(dontUpdatePageX + 80, height / 2 - 34, 20, 20, TextInst.of(">"), _ -> nextPage(),
 				ConfigScreen.isKeybindsHidden() ? null : new MVTooltip(TextInst.literal("")
 						.append(nextKeybind).append(TextInst.translatable("nbteditor.keybind.page.next")))))
 				.active = ClientChestScreen.PAGE < NBTEditorClient.CLIENT_CHEST.getPageCount() - 1;
-		
+
 		addRenderableWidget(MVMisc.newButton(dontUpdatePageX, height / 2 - 10, 100, 20,
-				TextInst.translatable("nbteditor.client_chest.reload_page"), btn -> {
-			LoadingScreen.show(ClientChestHelper.reloadPage(ClientChestScreen.PAGE), pageData -> ClientChestScreen.show());
-		}));
+				TextInst.translatable("nbteditor.client_chest.reload_page"), _ -> LoadingScreen.show(ClientChestHelper.reloadPage(ClientChestScreen.PAGE), pageData -> ClientChestScreen.show())));
 		addRenderableWidget(MVMisc.newButton(dontUpdatePageX, height / 2 + 14, 100, 20,
-				TextInst.translatable("nbteditor.client_chest.clear_page"), btn -> {
-			minecraft.setScreen(new FancyConfirmScreen(value -> {
-				if (value) {
-					LoadingScreen.show(ClientChestHelper.discardPage(ClientChestScreen.PAGE), success -> ClientChestScreen.show());
-					return;
-				}
-				
-				minecraft.setScreen(this);
-			}, TextInst.translatable("nbteditor.client_chest.clear_page.title"), TextInst.translatable("nbteditor.client_chest.clear_page.desc"),
-					TextInst.translatable("nbteditor.client_chest.clear_page.yes"), TextInst.translatable("nbteditor.client_chest.clear_page.no")));
-		}));
+				TextInst.translatable("nbteditor.client_chest.clear_page"), _ -> minecraft.gui.setScreen(new FancyConfirmScreen(value -> {
+                    if (value) {
+                        LoadingScreen.show(ClientChestHelper.discardPage(ClientChestScreen.PAGE), success -> ClientChestScreen.show());
+                        return;
+                    }
+
+                    minecraft.gui.setScreen(this);
+                }, TextInst.translatable("nbteditor.client_chest.clear_page.title"), TextInst.translatable("nbteditor.client_chest.clear_page.desc"),
+                        TextInst.translatable("nbteditor.client_chest.clear_page.yes"), TextInst.translatable("nbteditor.client_chest.clear_page.no")))));
 		
 		if (dataVersionStatus == DataVersionStatus.TOO_UPDATED)
 			return;
 		
 		addRenderableWidget(MVMisc.newButton(width / 2 - 158, height / 2 - 10, 100, 20,
-				TextInst.translatable("nbteditor.client_chest.data_version.import_page"), btn -> {
-					LoadingScreen.show(
-							addSuccessMessage(ClientChestHelper.importPage(ClientChestScreen.PAGE), false),
-							success -> ClientChestScreen.show());
-				}, new MVTooltip("nbteditor.client_chest.data_version.import_page.desc")))
+				TextInst.translatable("nbteditor.client_chest.data_version.import_page"), _ -> LoadingScreen.show(
+                        addSuccessMessage(ClientChestHelper.importPage(ClientChestScreen.PAGE), false),
+                        success -> ClientChestScreen.show()), new MVTooltip("nbteditor.client_chest.data_version.import_page.desc")))
 				.active = (dataVersionStatus == DataVersionStatus.UNKNOWN);
 		addRenderableWidget(MVMisc.newButton(width / 2 - 158, height / 2 + 14, 100, 20,
-				TextInst.translatable("nbteditor.client_chest.data_version.import_all_pages"), btn -> {
-					LoadingScreen.show(
-							addSuccessMessage(ClientChestHelper.importAllPages(), true),
-							success -> ClientChestScreen.show());
-				}, new MVTooltip("nbteditor.client_chest.data_version.import_all_pages.desc")));
+				TextInst.translatable("nbteditor.client_chest.data_version.import_all_pages"), _ -> LoadingScreen.show(
+                        addSuccessMessage(ClientChestHelper.importAllPages(), true),
+                        success -> ClientChestScreen.show()), new MVTooltip("nbteditor.client_chest.data_version.import_all_pages.desc")));
 		
 		dataVersion = addRenderableWidget(
 				new NamedTextFieldWidget(width / 2 - 50, height / 2 - 32, 100, 16, dataVersion)
 				.name(TextInst.translatable("nbteditor.nbt.import.data_version"))
 				.tooltip(new MVTooltip("nbteditor.nbt.import.data_version.desc")));
 		updatePageBtn = addRenderableWidget(MVMisc.newButton(width / 2 - 50, height / 2 - 10, 100, 20,
-				TextInst.translatable("nbteditor.client_chest.data_version.update_page"), btn -> {
+				TextInst.translatable("nbteditor.client_chest.data_version.update_page"), _ -> {
 					Optional<Integer> dataVersionValue = Version.getDataVersion(dataVersion.getValue())
 							.filter(value -> value < Version.getDataVersion());
 					if (dataVersionStatus == DataVersionStatus.UNKNOWN && dataVersionValue.isEmpty())
 						return;
 					
-					updateWithWarning(() -> {
-						LoadingScreen.show(
-								addSuccessMessage(ClientChestHelper.updatePage(ClientChestScreen.PAGE, dataVersionValue), false),
-								success -> ClientChestScreen.show());
-					});
+					updateWithWarning(() -> LoadingScreen.show(
+                            addSuccessMessage(ClientChestHelper.updatePage(ClientChestScreen.PAGE, dataVersionValue), false),
+                            success -> ClientChestScreen.show()));
 				}, new MVTooltip("nbteditor.client_chest.data_version.update_page.desc." + (dataVersionStatus == DataVersionStatus.UNKNOWN ? "unknown" : "old"))));
 		addRenderableWidget(MVMisc.newButton(width / 2 - 50, height / 2 + 14, 100, 20,
-				TextInst.translatable("nbteditor.client_chest.data_version.update_all_pages"), btn -> {
+				TextInst.translatable("nbteditor.client_chest.data_version.update_all_pages"), _ -> {
 					Optional<Integer> dataVersionValue = Version.getDataVersion(dataVersion.getValue())
 							.filter(value -> value < Version.getDataVersion());
 					
-					updateWithWarning(() -> {
-						LoadingScreen.show(
-								addSuccessMessage(ClientChestHelper.updateAllPages(dataVersionValue), true),
-								success -> ClientChestScreen.show());
-					});
+					updateWithWarning(() -> LoadingScreen.show(
+                            addSuccessMessage(ClientChestHelper.updateAllPages(dataVersionValue), true),
+                            success -> ClientChestScreen.show()));
 				}, new MVTooltip("nbteditor.client_chest.data_version.update_all_pages.desc")));
 	}
 	
@@ -220,11 +199,11 @@ public class ClientChestDataVersionScreen extends TickableSupportingScreen {
 			return;
 		}
 		
-		minecraft.setScreen(new FancyConfirmScreen(value -> {
+		minecraft.gui.setScreen(new FancyConfirmScreen(value -> {
 			if (value)
 				callback.run();
 			else
-				minecraft.setScreen(this);
+				minecraft.gui.setScreen(this);
 		}, TextInst.translatable("nbteditor.client_chest.data_version.update_page_confirm_1.20.5_1.20.6.title"),
 				TextInst.translatable("nbteditor.client_chest.data_version.update_page_confirm_1.20.5_1.20.6.desc")));
 	}

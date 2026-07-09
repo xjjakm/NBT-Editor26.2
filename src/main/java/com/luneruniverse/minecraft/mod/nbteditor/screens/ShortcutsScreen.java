@@ -1,23 +1,17 @@
 package com.luneruniverse.minecraft.mod.nbteditor.screens;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVDrawableHelper;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.ScreenTexts;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.ClientCommandManager;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.ConfigItem;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.ConfigList;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.ConfigPanel;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.ConfigPath;
-import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.ConfigValueText;
-
+import com.luneruniverse.minecraft.mod.nbteditor.screens.configurable.*;
 import net.minecraft.client.gui.screens.Screen;
-import com.mojang.blaze3d.vertex.PoseStack;
 import org.joml.Matrix3x2fStack;
+
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class ShortcutsScreen extends TickableSupportingScreen {
 	
@@ -47,8 +41,8 @@ public class ShortcutsScreen extends TickableSupportingScreen {
 			newPanel.setScroll(panel.getScroll());
 		panel = newPanel;
 		
-		this.addRenderableWidget(MVMisc.newButton(this.width - 134, this.height - 36, 100, 20, ScreenTexts.DONE, btn -> onClose()));
-		this.addRenderableWidget(MVMisc.newButton(this.width - 134, this.height - 36 - 24, 100, 20, ScreenTexts.CANCEL, btn -> {
+		this.addRenderableWidget(MVMisc.newButton(this.width - 134, this.height - 36, 100, 20, ScreenTexts.DONE, _ -> onClose()));
+		this.addRenderableWidget(MVMisc.newButton(this.width - 134, this.height - 36 - 24, 100, 20, ScreenTexts.CANCEL, _ -> {
 			cancel = true;
 			onClose();
 		}));
@@ -60,7 +54,7 @@ public class ShortcutsScreen extends TickableSupportingScreen {
 	}
 	
 	public void onClose() {
-		minecraft.setScreen(this.parent);
+		minecraft.gui.setScreen(this.parent);
 	}
 	
 	@SuppressWarnings("unchecked")

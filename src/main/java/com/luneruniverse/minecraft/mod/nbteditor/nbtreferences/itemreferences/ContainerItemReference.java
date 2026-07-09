@@ -1,15 +1,14 @@
 package com.luneruniverse.minecraft.mod.nbteditor.nbtreferences.itemreferences;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.luneruniverse.minecraft.mod.nbteditor.containers.ContainerIOs;
 import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalNBT;
 import com.luneruniverse.minecraft.mod.nbteditor.nbtreferences.NBTReference;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.containers.ContainerScreen;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
 import com.luneruniverse.minecraft.mod.nbteditor.util.SaveQueue;
-
 import net.minecraft.world.item.ItemStack;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ContainerItemReference<L extends LocalNBT> implements ItemReference {
 	
@@ -27,7 +26,7 @@ public class ContainerItemReference<L extends LocalNBT> implements ItemReference
 			contents[slot] = toSave;
 			ContainerIOs.write(containerValue, contents);
 			
-			if (MainUtil.client.screen instanceof ContainerScreen screen && screen.getReference() == container)
+			if (MainUtil.client.gui.screen() instanceof ContainerScreen screen && screen.getReference() == container)
 				screen.getMenu().getSlot(slot).set(toSave);
 			
 			AtomicBoolean done = new AtomicBoolean();

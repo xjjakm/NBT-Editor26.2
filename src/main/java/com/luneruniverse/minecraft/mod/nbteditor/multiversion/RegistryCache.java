@@ -1,5 +1,15 @@
 package com.luneruniverse.minecraft.mod.nbteditor.multiversion;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+
 import java.lang.invoke.MethodType;
 import java.lang.ref.WeakReference;
 import java.util.Collections;
@@ -8,17 +18,6 @@ import java.util.Optional;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
-
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.core.Holder;
-import net.minecraft.resources.Identifier;
 
 public class RegistryCache {
 	
@@ -50,11 +49,9 @@ public class RegistryCache {
 	private static final Supplier<Reflection.MethodInvoker> Registry_getKey =
 			Reflection.getOptionalMethod(Registry.class, "method_30517", MethodType.methodType(ResourceKey.class));
 	private static final LoadingCache<Registry<?>, Boolean> staticRegistries = CacheBuilder.newBuilder().build(
-			CacheLoader.from(registry -> {
-				return Version.<Boolean>newSwitch()
-						.range("1.21.2", null, () -> BuiltInRegistries.REGISTRY.getValue(registry.key().identifier()) != null)
-						.get();
-			}));
+			CacheLoader.from(registry -> Version.<Boolean>newSwitch()
+                    .range("1.21.2", null, () -> BuiltInRegistries.REGISTRY.getValue(registry.key().identifier()) != null)
+                    .get()));
 	public static boolean isRegistryStatic(Registry<?> registry) {
 		return staticRegistries.getUnchecked(registry);
 	}

@@ -1,16 +1,12 @@
 package com.luneruniverse.minecraft.mod.nbteditor.tagreferences.general;
 
-import java.lang.invoke.MethodType;
-import java.lang.reflect.Array;
-import java.util.AbstractList;
-
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
-
 import net.minecraft.nbt.*;
-
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+
+import java.lang.invoke.MethodType;
+import java.lang.reflect.Array;
 
 public class NBTTagReference<T> implements TagReference<T, CompoundTag> {
 	

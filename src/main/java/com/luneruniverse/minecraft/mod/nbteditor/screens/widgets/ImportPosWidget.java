@@ -1,12 +1,5 @@
 package com.luneruniverse.minecraft.mod.nbteditor.screens.widgets;
 
-import java.util.Optional;
-import java.util.function.Consumer;
-
-import net.minecraft.client.input.KeyEvent;
-import org.joml.Matrix3x2fStack;
-import org.lwjgl.glfw.GLFW;
-
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVDrawableHelper;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.ScreenTexts;
@@ -14,10 +7,15 @@ import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.OverlayScreen;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.OverlaySupportingScreen;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
-
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.core.BlockPos;
+import org.joml.Matrix3x2fStack;
+import org.lwjgl.glfw.GLFW;
+
+import java.util.Optional;
+import java.util.function.Consumer;
 
 public class ImportPosWidget extends GroupWidget implements InitializableOverlay<Screen> {
 	
@@ -71,13 +69,13 @@ public class ImportPosWidget extends GroupWidget implements InitializableOverlay
 			z.setValue("" + defaultPos.getZ());
 		}
 		
-		addWidget(MVMisc.newButton(width / 2 - 102, height / 2 + 2, 100, 20, ScreenTexts.DONE, btn -> done()));
-		addWidget(MVMisc.newButton(width / 2 + 2, height / 2 + 2, 100, 20, ScreenTexts.CANCEL, btn -> posConsumer.accept(Optional.empty())));
+		addWidget(MVMisc.newButton(width / 2 - 102, height / 2 + 2, 100, 20, ScreenTexts.DONE, _ -> done()));
+		addWidget(MVMisc.newButton(width / 2 + 2, height / 2 + 2, 100, 20, ScreenTexts.CANCEL, _ -> posConsumer.accept(Optional.empty())));
 	}
 	
 	@Override
 	public void extractRenderState(Matrix3x2fStack matrices, int mouseX, int mouseY, float delta) {
-		MainUtil.client.screen.extractBackground(MVDrawableHelper.getDrawContext(matrices),mouseX, mouseY, delta);
+		MainUtil.client.gui.screen().extractBackground(MVDrawableHelper.getDrawContext(matrices),mouseX, mouseY, delta);
 		super.extractRenderState(matrices, mouseX, mouseY, delta);
 		MVDrawableHelper.drawCenteredTextWithShadow(matrices, textRenderer, TextInst.translatable("nbteditor.nbt.import.pos"),
 				width / 2, height / 2 - textRenderer.lineHeight - 22, -1);

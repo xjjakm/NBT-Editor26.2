@@ -1,21 +1,18 @@
 package com.luneruniverse.minecraft.mod.nbteditor.multiversion;
 
+import com.luneruniverse.minecraft.mod.nbteditor.misc.MixinLink;
+import com.luneruniverse.minecraft.mod.nbteditor.util.TextUtil;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
+import org.joml.Matrix3x2fStack;
+import org.lwjgl.opengl.GL20;
+
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.joml.Matrix3x2fStack;
-import org.lwjgl.opengl.GL20;
-
-import com.luneruniverse.minecraft.mod.nbteditor.misc.MixinLink;
-import com.luneruniverse.minecraft.mod.nbteditor.util.TextUtil;
-
-import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.components.Button;
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.network.chat.Component;
 
 public class MVTooltip {
 	

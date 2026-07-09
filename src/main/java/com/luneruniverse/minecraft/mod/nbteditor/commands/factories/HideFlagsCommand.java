@@ -23,7 +23,7 @@ public class HideFlagsCommand extends ClientCommand {
 	@Override
 	public void register(LiteralArgumentBuilder<FabricClientCommandSource> builder, String path) {
 		builder.executes(context -> {
-			MainUtil.client.setScreen(new HideFlagsScreen(ItemReference.getHeldItem()));
+			MainUtil.client.gui.setScreen(new HideFlagsScreen(ItemReference.getHeldItem()));
 			return Command.SINGLE_SUCCESS;
 		});
 	}

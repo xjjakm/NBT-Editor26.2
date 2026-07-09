@@ -1,22 +1,16 @@
 package com.luneruniverse.minecraft.mod.nbteditor.screens;
 
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-
 import com.luneruniverse.minecraft.mod.nbteditor.NBTEditor;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVDrawableHelper;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVScreen;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
-
-import com.mojang.blaze3d.vertex.PoseStack;
 import org.joml.Matrix3x2fStack;
+
+import java.util.concurrent.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class LoadingScreen extends MVScreen {
 	
@@ -40,7 +34,7 @@ public class LoadingScreen extends MVScreen {
 		}
 		
 		onLoading.run();
-		MainUtil.client.setScreen(new LoadingScreen(future, value -> onFinish.accept(true, value), e -> onException.accept(true, e)));
+		MainUtil.client.gui.setScreen(new LoadingScreen(future, value -> onFinish.accept(true, value), e -> onException.accept(true, e)));
 	}
 	public static <T> void show(CompletableFuture<T> future, Runnable onLoading, BiConsumer<Boolean, T> onFinish) {
 		show(future, onLoading, onFinish, (loaded, e) -> NBTEditor.LOGGER.error("Error processing something", e));
@@ -66,7 +60,7 @@ public class LoadingScreen extends MVScreen {
 	
 	@Override
 	protected void init() {
-		addRenderableWidget(MVMisc.newButton(width / 2 - 75, height / 2, 150, 20, TextInst.translatable("nbteditor.hide"), btn -> onClose()));
+		addRenderableWidget(MVMisc.newButton(width / 2 - 75, height / 2, 150, 20, TextInst.translatable("nbteditor.hide"), _ -> onClose()));
 	}
 	
 	@Override

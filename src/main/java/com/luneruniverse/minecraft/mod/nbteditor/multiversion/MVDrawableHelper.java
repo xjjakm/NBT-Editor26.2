@@ -1,34 +1,24 @@
 package com.luneruniverse.minecraft.mod.nbteditor.multiversion;
 
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.function.Supplier;
-
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
-
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.RenderPipelines;
-import com.mojang.blaze3d.opengl.GlProgram;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.feature.ItemFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.MultiBufferSource;
-
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.item.ItemStack;
 import org.joml.Matrix3x2fStack;
+
+import java.lang.invoke.MethodType;
+import java.util.List;
+import java.util.function.Supplier;
 
 public class MVDrawableHelper {
 	
@@ -47,27 +37,7 @@ public class MVDrawableHelper {
 				.range("1.20.0", null, () -> caller.extractRenderState(MVDrawableHelper.getDrawContext(matrices), mouseX, mouseY, delta))
 				.run();
 	}
-	
-	public static MultiBufferSource.BufferSource getVertexConsumerProvider() {
-		return MainUtil.client.gameRenderer.renderBuffers.bufferSource();
-	}
-	
-	
-	private static final Cache<String, Reflection.MethodInvoker> methodCache = CacheBuilder.newBuilder().build();
-	@SuppressWarnings("unchecked")
-	private static <R> R call(String method, Class<?> rtype, Class<?>[] ptypes, Matrix3x2fStack matrices, Object... args) {
-		try {
-			GuiGraphicsExtractor context;
-			MethodType type;
-			context = MVDrawableHelper.getDrawContext(matrices);
-			type = MethodType.methodType(rtype, ptypes);
-			return (R) methodCache.get(method, () -> Reflection.getMethod(GuiGraphicsExtractor.class, method, type)).invoke(context, args);
-		} catch (ExecutionException | UncheckedExecutionException e) {
-			throw new RuntimeException("Error invoking method", e);
-		}
-	}
-	
-	
+
 	public static void fill(Matrix3x2fStack matrices, int x1, int y1, int x2, int y2, int color) {
 		MVDrawableHelper.getDrawContext(matrices).fill(x1, y1, x2, y2, color);
 	}
@@ -98,12 +68,6 @@ public class MVDrawableHelper {
 	
 	private static final Supplier<Reflection.MethodInvoker> DrawContext_drawTexture =
 			Reflection.getOptionalMethod(GuiGraphicsExtractor.class, "method_25290", MethodType.methodType(void.class, Identifier.class, int.class, int.class, float.class, float.class, int.class, int.class, int.class, int.class));
-	private static final Supplier<Reflection.MethodInvoker> GameRenderer_getPositionTexProgram =
-			Reflection.getOptionalMethod(GameRenderer.class, "method_34542", MethodType.methodType(GlProgram.class));
-	private static final Supplier<Reflection.MethodInvoker> RenderSystem_setShader =
-			Reflection.getOptionalMethod(RenderSystem.class, "setShader", MethodType.methodType(void.class, Supplier.class));
-	private static final Supplier<Reflection.MethodInvoker> RenderSystem_setShaderTexture =
-			Reflection.getOptionalMethod(RenderSystem.class, "setShaderTexture", MethodType.methodType(void.class, int.class, Identifier.class));
 	public static void drawTexture(Matrix3x2fStack matrices, Identifier texture, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight) {
 		Version.newSwitch()
 				.range("1.21.2", null, () -> getDrawContext(matrices).blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, width, height, textureWidth, textureHeight))
@@ -114,21 +78,12 @@ public class MVDrawableHelper {
 		drawTexture(matrices, texture, x, y, u, v, width, height, 256, 256);
 	}
 	
-	private static final Supplier<Reflection.MethodInvoker> Screen_renderTooltip_Text =
-			Reflection.getOptionalMethod(Screen.class, "method_25424", MethodType.methodType(void.class, PoseStack.class, Component.class, int.class, int.class));
-	public static void renderTooltip(Matrix3x2fStack matrices, Component text, int x, int y) {
-		Version.newSwitch()
-				.range("1.20.0", null, () -> getDrawContext(matrices).setTooltipForNextFrame(MainUtil.client.font, text, x, y))
-				.range(null, "1.19.4", () -> Screen_renderTooltip_Text.get().invoke(MainUtil.client.screen, matrices, text, x, y))
-				.run();
-	}
-	
 	private static final Supplier<Reflection.MethodInvoker> Screen_renderTooltip_List =
 			Reflection.getOptionalMethod(Screen.class, "method_25417", MethodType.methodType(void.class, PoseStack.class, List.class, int.class, int.class));
 	public static void renderTooltip(Matrix3x2fStack matrices, List<FormattedCharSequence> lines, int x, int y) {
 		Version.newSwitch()
 				.range("1.20.0", null, () -> getDrawContext(matrices).setTooltipForNextFrame(MainUtil.client.font, lines, x, y))
-				.range(null, "1.19.4", () -> Screen_renderTooltip_List.get().invoke(MainUtil.client.screen, matrices, lines, x, y))
+				.range(null, "1.19.4", () -> Screen_renderTooltip_List.get().invoke(MainUtil.client.gui.screen(), matrices, lines, x, y))
 				.run();
 	}
 

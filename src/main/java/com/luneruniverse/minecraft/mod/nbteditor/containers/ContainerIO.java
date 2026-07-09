@@ -3,15 +3,12 @@ package com.luneruniverse.minecraft.mod.nbteditor.containers;
 import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalNBT;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.IdentifierInst;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.ItemTagReferences;
-import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
-
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.component.TypedEntityData;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.TypedEntityData;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 public interface ContainerIO<T> {
 	public static final Identifier HELMET_TEXTURE = IdentifierInst.of("minecraft", "container/slot/helmet");
@@ -49,7 +46,7 @@ public interface ContainerIO<T> {
 			if (nbt == null)
 				return new CompoundTag();
 			return nbt;
-		}, (item, nbt) -> item.setNBT(nbt));
+		}, LocalNBT::setNBT);
 	}
 	
 	/**

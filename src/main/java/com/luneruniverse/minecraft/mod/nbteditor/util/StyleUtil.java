@@ -1,15 +1,15 @@
 package com.luneruniverse.minecraft.mod.nbteditor.util;
 
-import java.util.Objects;
-
 import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalBlock;
 import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalEntity;
 import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalItem;
 import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalNBT;
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
-
-import net.minecraft.network.chat.Style;
 import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Style;
+
+import java.util.Objects;
 
 public class StyleUtil {
 	
@@ -23,16 +23,19 @@ public class StyleUtil {
 	
 	public static Style getBaseNameStyle(LocalNBT localNBT, boolean itemName) {
 		Style baseNameStyle = Style.EMPTY;
-		if (localNBT instanceof LocalItem item) {
-			if (!itemName)
-				baseNameStyle = baseNameStyle.applyFormat(ChatFormatting.ITALIC);
-			baseNameStyle = baseNameStyle.applyFormat(item.getEditableItem().getRarity().color);
-		} else if (localNBT instanceof LocalBlock)
-			;
-		else if (localNBT instanceof LocalEntity)
-			baseNameStyle = baseNameStyle.applyFormat(ChatFormatting.WHITE);
-		else
-			throw new IllegalStateException("Cannot get base name style for " + localNBT.getClass().getName());
+        switch (localNBT) {
+            case LocalItem item -> {
+                if (!itemName)
+                    baseNameStyle = baseNameStyle.applyFormat(ChatFormatting.ITALIC);
+                baseNameStyle = baseNameStyle.applyFormat(item.getEditableItem().getRarity().color);
+            }
+            case LocalBlock _ -> {
+            }
+            case LocalEntity _ -> baseNameStyle = baseNameStyle.applyFormat(ChatFormatting.WHITE);
+            case null -> throw new IllegalStateException("Cannot get base name style for null");
+            default ->
+                    throw new IllegalStateException("Cannot get base name style for " + localNBT.getClass().getName());
+        }
 		
 		return baseNameStyle;
 	}
@@ -90,7 +93,7 @@ public class StyleUtil {
 			output = output.withHoverEvent(style.getHoverEvent());
 		if (style.getInsertion() != null && !style.getInsertion().equals(base.getInsertion()))
 			output = output.withInsertion(style.getInsertion());
-		if (style.getFont() != null && !style.getFont().equals(base.getFont()))
+		if (!style.getFont().equals(base.getFont()))
 			output = output.withFont(style.getFont());
 		
 		if (SHADOW_COLOR_EXISTS && style.getShadowColor() != null && !style.getShadowColor().equals(base.getShadowColor()))
@@ -102,7 +105,7 @@ public class StyleUtil {
 	public static Style minusFormatting(Style style, Style base, ChatFormatting formatting) {
 		if (formatting == ChatFormatting.RESET)
 			return base;
-		if (formatting.isColor())
+		if (MVMisc.isChatFormattingColor(formatting))
 			return style.withColor(base.getColor());
 		return switch (formatting) {
 			case BOLD -> style.withBold(base.bold);

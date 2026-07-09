@@ -1,7 +1,5 @@
 package com.luneruniverse.minecraft.mod.nbteditor.tagreferences;
 
-import java.util.Optional;
-
 import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalBlock;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.general.NBTComponentTagReference;
@@ -9,9 +7,9 @@ import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.general.TagRefere
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific.GameProfileNBTTagReference;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific.GameProfileNameNBTTagReference;
 import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.PropertyMap;
-
 import net.minecraft.world.item.component.ResolvableProfile;
+
+import java.util.Optional;
 
 public class BlockTagReferences {
 	

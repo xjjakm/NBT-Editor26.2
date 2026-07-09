@@ -16,24 +16,21 @@
 
 package com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.mixin.client;
 
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.ClientCommandInternals;
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.ClientCommandManager;
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.FabricClientCommandSource;
+import com.mojang.brigadier.CommandDispatcher;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.multiplayer.ClientSuggestionProvider;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.protocol.game.ClientboundCommandsPacket;
+import net.minecraft.network.protocol.game.ClientboundLoginPacket;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.ClientCommandInternals;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.ClientCommandManager;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.FabricClientCommandSource;
-import com.mojang.brigadier.CommandDispatcher;
-
-import net.minecraft.client.multiplayer.ClientSuggestionProvider;
-import net.minecraft.client.multiplayer.ClientPacketListener;
-import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.network.protocol.game.ClientboundCommandsPacket;
-import net.minecraft.network.protocol.game.ClientboundLoginPacket;
 
 @Mixin(ClientPacketListener.class)
 abstract class ClientPacketListenerMixin {

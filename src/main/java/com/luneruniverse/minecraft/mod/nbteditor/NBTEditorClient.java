@@ -1,11 +1,5 @@
 package com.luneruniverse.minecraft.mod.nbteditor;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.luneruniverse.minecraft.mod.nbteditor.addons.NBTEditorAPI;
 import com.luneruniverse.minecraft.mod.nbteditor.addons.NBTEditorAddon;
 import com.luneruniverse.minecraft.mod.nbteditor.async.HeadRefreshThread;
@@ -16,14 +10,12 @@ import com.luneruniverse.minecraft.mod.nbteditor.misc.MixinLink;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVEnchantments;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.networking.MVClientNetworking;
 import com.luneruniverse.minecraft.mod.nbteditor.packets.OpenEnderChestC2SPacket;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.ConfigScreen;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.containers.ClientChestScreen;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.containers.CursorManager;
 import com.luneruniverse.minecraft.mod.nbteditor.server.NBTEditorServer;
-
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
@@ -34,6 +26,12 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import tsp.headdb.ported.HeadAPI;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class NBTEditorClient implements ClientModInitializer {
 	

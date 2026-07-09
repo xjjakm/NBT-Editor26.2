@@ -1,12 +1,5 @@
 package com.luneruniverse.minecraft.mod.nbteditor.commands.arguments;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.BiFunction;
-
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVRegistry;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
@@ -18,12 +11,18 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.resources.Identifier;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
 
 public class EffectListArgumentType implements ArgumentType<Collection<MobEffectInstance>> {
 	
@@ -56,9 +55,7 @@ public class EffectListArgumentType implements ArgumentType<Collection<MobEffect
 	}
 	
 	private static final Collection<String> EXAMPLES = Arrays.asList("minecraft:blindness -duration:1 -showparticles:false", "minecraft:jump_boost");
-	public static final DynamicCommandExceptionType INVALID_EFFECT_EXCEPTION = new DynamicCommandExceptionType((id) -> {
-		return TextInst.translatable("effect.effectNotFound", new Object[]{id});
-	});
+	public static final DynamicCommandExceptionType INVALID_EFFECT_EXCEPTION = new DynamicCommandExceptionType((id) -> TextInst.translatable("effect.effectNotFound", new Object[]{id}));
 
 	public static EffectListArgumentType effectList() {
 		return new EffectListArgumentType();
@@ -75,9 +72,7 @@ public class EffectListArgumentType implements ArgumentType<Collection<MobEffect
 		List<MobEffectInstance> effects = new ArrayList<>();
 		while (stringReader.canRead()) {
 			Identifier identifier = Identifier.read(stringReader);
-			MobEffect type = MVRegistry.STATUS_EFFECT.getOrEmpty(identifier).orElseThrow(() -> {
-				return INVALID_EFFECT_EXCEPTION.create(identifier);
-			});
+			MobEffect type = MVRegistry.STATUS_EFFECT.getOrEmpty(identifier).orElseThrow(() -> INVALID_EFFECT_EXCEPTION.create(identifier));
 			if (!stringReader.canRead()) {
 				effects.add(MVMisc.newMobEffectInstance(type, 5 * 20));
 				break;

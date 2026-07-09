@@ -1,19 +1,16 @@
 package com.luneruniverse.minecraft.mod.nbteditor.multiversion.nbt.manager.nbt;
 
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Attempt;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.DynamicRegistryManagerHolder;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.nbt.manager.NBTManager;
-
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
 import net.minecraft.data.registries.VanillaRegistries;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.TagValueOutput;
-import net.minecraft.world.level.storage.ValueOutput;
-import net.minecraft.util.ProblemReporter;
 
 public class NBTEntityNBTManager implements NBTManager<Entity> {
 	

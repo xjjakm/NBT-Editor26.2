@@ -1,17 +1,15 @@
 package com.luneruniverse.minecraft.mod.nbteditor.tagreferences.general;
 
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.DynamicRegistryManagerHolder;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
-
 import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
+
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class NBTComponentTagReference<T, C> implements TagReference<T, CompoundTag> {
 	

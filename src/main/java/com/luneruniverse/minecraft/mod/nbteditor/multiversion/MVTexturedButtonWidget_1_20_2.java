@@ -42,7 +42,7 @@ class MVTexturedButtonWidget_1_20_2 extends Button {
 		} else if (isHoveredOrFocused()) {
 			i += hoveredVOffset;
 		}
-		MVGlStateManager._enableDepthTest();
+		// 26.2: No GL state calls in extractRenderState; blit submits to deferred render pipeline
 		MVDrawableHelper.drawTexture(MVDrawableHelper.getMatrices(context), texture, x, y, u, i, width, height, textureWidth, textureHeight);
 	}
 	

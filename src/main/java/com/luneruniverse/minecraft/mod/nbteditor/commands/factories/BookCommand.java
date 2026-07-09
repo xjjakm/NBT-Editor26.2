@@ -1,15 +1,8 @@
 package com.luneruniverse.minecraft.mod.nbteditor.commands.factories;
 
-import static com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.ClientCommandManager.literal;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-
 import com.luneruniverse.minecraft.mod.nbteditor.commands.ClientCommand;
 import com.luneruniverse.minecraft.mod.nbteditor.containers.ContainerIOs;
 import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalNBT;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVComponentType;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.FabricClientCommandSource;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.nbt.manager.NBTManagers;
@@ -26,12 +19,17 @@ import com.luneruniverse.minecraft.mod.nbteditor.util.StyleUtil;
 import com.luneruniverse.minecraft.mod.nbteditor.util.TextUtil;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.block.Blocks;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
+import static com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.ClientCommandManager.literal;
 
 public class BookCommand extends ClientCommand {
 	
@@ -64,7 +62,8 @@ public class BookCommand extends ClientCommand {
 		if (NBTManagers.COMPONENTS_EXIST)
 			item.remove(DataComponents.WRITTEN_BOOK_CONTENT);
 		if (formatted) {
-			MainUtil.client.player.sendSystemMessage(TextInst.translatable("nbteditor.book.convert.formatting_saved"));
+			if (MainUtil.client.player != null)
+				MainUtil.client.player.sendSystemMessage(TextInst.translatable("nbteditor.book.convert.formatting_saved"));
 			MainUtil.get(item, true);
 		} else
 			ref.saveItem(item, TextInst.translatable("nbteditor.book.convert.success"));
@@ -94,10 +93,10 @@ public class BookCommand extends ClientCommand {
 			WrittenBookTagReferences.GENERATION.set(book, 0);
 			WrittenBookTagReferences.PAGES.set(book, new ArrayList<>());
 			ref.saveItem(book);
-			MainUtil.client.setScreen(new BookScreen(ref));
+			MainUtil.client.gui.setScreen(new BookScreen(ref));
 			return Command.SINGLE_SUCCESS;
 		})).executes(context -> {
-			getReference(ref -> MainUtil.client.setScreen(new BookScreen(ref)));
+			getReference(ref -> MainUtil.client.gui.setScreen(new BookScreen(ref)));
 			return Command.SINGLE_SUCCESS;
 		});
 	}

@@ -23,7 +23,7 @@ public class EnchantmentsCommand extends ClientCommand {
 	@Override
 	public void register(LiteralArgumentBuilder<FabricClientCommandSource> builder, String path) {
 		builder.executes(context -> {
-			MainUtil.client.setScreen(new EnchantmentsScreen(ItemReference.getHeldItem()));
+			MainUtil.client.gui.setScreen(new EnchantmentsScreen(ItemReference.getHeldItem()));
 			return Command.SINGLE_SUCCESS;
 		});
 	}

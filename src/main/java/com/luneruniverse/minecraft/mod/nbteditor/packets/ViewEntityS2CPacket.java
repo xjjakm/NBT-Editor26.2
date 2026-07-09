@@ -1,16 +1,14 @@
 package com.luneruniverse.minecraft.mod.nbteditor.packets;
 
-import java.util.UUID;
-
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.IdentifierInst;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVRegistryKeys;
-
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+
+import java.util.UUID;
 
 public class ViewEntityS2CPacket implements ResponsePacket {
 	
@@ -52,7 +50,7 @@ public class ViewEntityS2CPacket implements ResponsePacket {
 		}
 	}
 	
-	public int getRequestId() {
+	public int requestId() {
 		return requestId;
 	}
 	public ResourceKey<Level> getWorld() {

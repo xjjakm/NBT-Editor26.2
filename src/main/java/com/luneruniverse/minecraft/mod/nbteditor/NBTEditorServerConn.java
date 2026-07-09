@@ -1,33 +1,28 @@
 package com.luneruniverse.minecraft.mod.nbteditor;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.networking.MVClientNetworking;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.networking.MVPacket;
-import com.luneruniverse.minecraft.mod.nbteditor.packets.ContainerScreenS2CPacket;
-import com.luneruniverse.minecraft.mod.nbteditor.packets.ProtocolVersionS2CPacket;
-import com.luneruniverse.minecraft.mod.nbteditor.packets.ResponsePacket;
-import com.luneruniverse.minecraft.mod.nbteditor.packets.ViewBlockS2CPacket;
-import com.luneruniverse.minecraft.mod.nbteditor.packets.ViewEntityS2CPacket;
+import com.luneruniverse.minecraft.mod.nbteditor.packets.*;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.ConfigScreen;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.containers.ClientChestScreen;
 import com.luneruniverse.minecraft.mod.nbteditor.screens.containers.ContainerScreen;
 import com.luneruniverse.minecraft.mod.nbteditor.server.NBTEditorServer;
 import com.luneruniverse.minecraft.mod.nbteditor.server.ServerMVMisc;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
-
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.world.level.GameType;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 public class NBTEditorServerConn implements MVClientNetworking.PlayNetworkStateEvents.Start, MVClientNetworking.PlayNetworkStateEvents.Stop {
 	
@@ -57,22 +52,23 @@ public class NBTEditorServerConn implements MVClientNetworking.PlayNetworkStateE
 		MVClientNetworking.PlayNetworkStateEvents.Start.EVENT.register(this);
 		MVClientNetworking.PlayNetworkStateEvents.Stop.EVENT.register(this);
 	}
-	
-	public Status getStatus() {
-		return status;
-	}
+
 	public boolean isEditingExpanded() {
 		if (status != Status.BOTH)
+			return false;
+		if (MainUtil.client.gameMode == null)
 			return false;
 		GameType gameMode = MainUtil.client.gameMode.getPlayerMode();
 		return (gameMode.isCreative() || gameMode.isSurvival()) && ServerMVMisc.hasPermissionLevel(MainUtil.client.player, 2);
 	}
 	public boolean isEditingAllowed() {
+		if (MainUtil.client.gameMode == null)
+			return false;
 		return MainUtil.client.gameMode.getPlayerMode().isCreative() || isEditingExpanded();
 	}
 	
 	public boolean isScreenEditable() {
-		Screen screen = MainUtil.client.screen;
+		Screen screen = MainUtil.client.gui.screen();
 		return screen instanceof CreativeModeInventoryScreen ||
 				screen instanceof ClientChestScreen ||
 				screen instanceof ContainerScreen ||
@@ -102,7 +98,7 @@ public class NBTEditorServerConn implements MVClientNetworking.PlayNetworkStateE
 		});
 	}
 	private void receiveRequest(ResponsePacket packet) {
-		CompletableFuture<MVPacket> receiver = requests.remove(packet.getRequestId());
+		CompletableFuture<MVPacket> receiver = requests.remove(packet.requestId());
 		if (receiver != null)
 			receiver.complete(packet);
 	}
@@ -118,7 +114,7 @@ public class NBTEditorServerConn implements MVClientNetworking.PlayNetworkStateE
 	}
 	
 	private void onProtocolVersionPacket(ProtocolVersionS2CPacket packet) {
-		if (packet.getVersion() == NBTEditorServer.PROTOCOL_VERSION)
+		if (packet.version() == NBTEditorServer.PROTOCOL_VERSION)
 			status = Status.BOTH;
 		else {
 			status = Status.INCOMPATIBLE;

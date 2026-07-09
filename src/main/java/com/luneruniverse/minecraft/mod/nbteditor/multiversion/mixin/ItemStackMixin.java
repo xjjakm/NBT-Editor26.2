@@ -1,20 +1,17 @@
 package com.luneruniverse.minecraft.mod.nbteditor.multiversion.mixin;
 
-import java.lang.invoke.MethodType;
-import java.util.function.Supplier;
-
-import net.minecraft.core.component.DataComponents;
-import org.spongepowered.asm.mixin.Mixin;
-
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVComponentType;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Reflection;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.nbt.MVItemStackParent;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.nbt.manager.IntegratedNBTManager;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.nbt.manager.NBTManagers;
-
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import org.spongepowered.asm.mixin.Mixin;
+
+import java.lang.invoke.MethodType;
+import java.util.function.Supplier;
 
 @Mixin(ItemStack.class)
 public class ItemStackMixin implements IntegratedNBTManager, MVItemStackParent {

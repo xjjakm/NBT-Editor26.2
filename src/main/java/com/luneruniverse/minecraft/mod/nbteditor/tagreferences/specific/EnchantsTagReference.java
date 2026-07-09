@@ -1,26 +1,18 @@
 package com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific;
 
-import java.util.ArrayList;
-import java.util.stream.Collectors;
-
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.IdentifierInst;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVComponentType;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVRegistry;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.general.ComponentTagReference;
-import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.general.NBTTagReference;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.general.TagReference;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific.data.Enchants;
-
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.minecraft.world.item.enchantment.ItemEnchantments;
-import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
+
+import java.util.stream.Collectors;
 
 public class EnchantsTagReference implements TagReference<Enchants, ItemStack> {
 	
@@ -31,7 +23,7 @@ public class EnchantsTagReference implements TagReference<Enchants, ItemStack> {
 						componentValue -> componentValue == null ? new Enchants() : new Enchants(componentValue.entrySet().stream()
 								.map(entry -> new Enchants.EnchantWithLevel(entry.getKey().value(), entry.getIntValue())).collect(Collectors.toList())),
 						(componentValue, enchants) -> (ItemEnchantments) MVMisc.withEnchantments(componentValue,
-								new Object2IntOpenHashMap<>(enchants.getEnchants().stream().collect(Collectors.toMap(
+								new Object2IntOpenHashMap<>(enchants.enchants().stream().collect(Collectors.toMap(
 										enchant -> MVRegistry.getEnchantmentRegistry().getInternalValue().wrapAsHolder(enchant.enchant()),
 										enchant -> Math.min(255, enchant.level()),
 										Math::max))))))

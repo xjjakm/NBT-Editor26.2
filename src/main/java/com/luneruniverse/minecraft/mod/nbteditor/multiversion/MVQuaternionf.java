@@ -1,18 +1,13 @@
 package com.luneruniverse.minecraft.mod.nbteditor.multiversion;
 
-import java.lang.invoke.MethodType;
-import java.util.concurrent.ExecutionException;
-import java.util.function.Supplier;
-
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import org.joml.Matrix3x2fStack;
-import org.joml.Quaternionf;
-
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.util.concurrent.UncheckedExecutionException;
+import org.joml.Quaternionf;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import java.lang.invoke.MethodType;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Supplier;
 
 public class MVQuaternionf {
 	

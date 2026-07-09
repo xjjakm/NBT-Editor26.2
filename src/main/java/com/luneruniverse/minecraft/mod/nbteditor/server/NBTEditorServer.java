@@ -1,53 +1,41 @@
 package com.luneruniverse.minecraft.mod.nbteditor.server;
 
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.IdentifierInst;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVRegistry;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Reflection;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.nbt.manager.NBTManagers;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.networking.MVServerNetworking;
-import com.luneruniverse.minecraft.mod.nbteditor.packets.GetBlockC2SPacket;
-import com.luneruniverse.minecraft.mod.nbteditor.packets.GetEntityC2SPacket;
-import com.luneruniverse.minecraft.mod.nbteditor.packets.GetLecternBlockC2SPacket;
-import com.luneruniverse.minecraft.mod.nbteditor.packets.OpenEnderChestC2SPacket;
-import com.luneruniverse.minecraft.mod.nbteditor.packets.ProtocolVersionS2CPacket;
-import com.luneruniverse.minecraft.mod.nbteditor.packets.SetBlockC2SPacket;
-import com.luneruniverse.minecraft.mod.nbteditor.packets.SetCursorC2SPacket;
-import com.luneruniverse.minecraft.mod.nbteditor.packets.SetEntityC2SPacket;
-import com.luneruniverse.minecraft.mod.nbteditor.packets.SetSlotC2SPacket;
-import com.luneruniverse.minecraft.mod.nbteditor.packets.SummonEntityC2SPacket;
-import com.luneruniverse.minecraft.mod.nbteditor.packets.ViewBlockS2CPacket;
-import com.luneruniverse.minecraft.mod.nbteditor.packets.ViewEntityS2CPacket;
+import com.luneruniverse.minecraft.mod.nbteditor.packets.*;
 import com.luneruniverse.minecraft.mod.nbteditor.util.BlockStateProperties;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
-
+import net.minecraft.IdentifierException;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.*;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.LecternBlockEntity;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Entity.RemovalReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.Container;
 import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.LecternMenu;
-import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.resources.Identifier;
-import net.minecraft.IdentifierException;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.LecternBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class NBTEditorServer implements MVServerNetworking.PlayNetworkStateEvents.Start {
 	
@@ -94,7 +82,7 @@ public class NBTEditorServer implements MVServerNetworking.PlayNetworkStateEvent
 		if (!ServerMVMisc.hasPermissionLevel(player, 2))
 			return;
 		
-		MainUtil.setCursorStackSilently(player.containerMenu, packet.getItem());
+		MainUtil.setCursorStackSilently(player.containerMenu, packet.item());
 	}
 	
 	private void onSetSlotPacket(SetSlotC2SPacket packet, ServerPlayer player) {
@@ -143,12 +131,12 @@ public class NBTEditorServer implements MVServerNetworking.PlayNetworkStateEvent
 			Container inv = handler.lectern;
 			LecternBlockEntity lectern = Reflection.getField(inv.getClass(), "field_17391", "Lnet/minecraft/class_3722;").get(inv);
 			if (lectern != null) {
-				sendViewBlockPacket(packet.getRequestId(), lectern, player);
+				sendViewBlockPacket(packet.requestId(), lectern, player);
 				return;
 			}
 		}
 		
-		MVServerNetworking.send(player, new ViewBlockS2CPacket(packet.getRequestId(), null, null, null, null, null));
+		MVServerNetworking.send(player, new ViewBlockS2CPacket(packet.requestId(), null, null, null, null, null));
 	}
 	private void sendViewBlockPacket(int requestId, BlockEntity blockEntity, ServerPlayer player) {
 		MVServerNetworking.send(player,

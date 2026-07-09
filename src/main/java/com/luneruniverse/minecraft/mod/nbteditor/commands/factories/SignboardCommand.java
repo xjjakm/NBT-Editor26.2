@@ -1,8 +1,5 @@
 package com.luneruniverse.minecraft.mod.nbteditor.commands.factories;
 
-import static com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.ClientCommandManager.argument;
-import static com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.ClientCommandManager.literal;
-
 import com.luneruniverse.minecraft.mod.nbteditor.commands.ClientCommand;
 import com.luneruniverse.minecraft.mod.nbteditor.commands.arguments.SignboardArgumentType;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
@@ -15,10 +12,12 @@ import com.luneruniverse.minecraft.mod.nbteditor.screens.factories.SignboardScre
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-
-import net.minecraft.world.level.block.SignBlock;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.SignBlock;
+
+import static com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.ClientCommandManager.argument;
+import static com.luneruniverse.minecraft.mod.nbteditor.multiversion.commands.ClientCommandManager.literal;
 
 public class SignboardCommand extends ClientCommand {
 	
@@ -44,10 +43,10 @@ public class SignboardCommand extends ClientCommand {
 		builder.then(literal("new").then(argument("sign", SignboardArgumentType.signboard()).executes(context -> {
 			ItemReference ref = ItemReference.getHeldAir();
 			ref.saveItem(new ItemStack(context.getArgument("sign", Item.class)));
-			MainUtil.client.setScreen(new SignboardScreen<>(ref));
+			MainUtil.client.gui.setScreen(new SignboardScreen<>(ref));
 			return Command.SINGLE_SUCCESS;
 		}))).executes(context -> {
-			NBTReference.getReference(SIGNBOARD_FILTER, false, ref -> MainUtil.client.setScreen(new SignboardScreen<>(ref)));
+			NBTReference.getReference(SIGNBOARD_FILTER, false, ref -> MainUtil.client.gui.setScreen(new SignboardScreen<>(ref)));
 			return Command.SINGLE_SUCCESS;
 		});
 	}

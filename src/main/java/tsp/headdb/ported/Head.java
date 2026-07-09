@@ -1,21 +1,21 @@
 package tsp.headdb.ported;
 
-import java.util.*;
-
 import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
-import com.mojang.authlib.properties.PropertyMap;
-import net.minecraft.core.component.DataComponents;
-import org.apache.commons.lang3.Validate;
-
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.TextInst;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.nbt.manager.NBTManagers;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.ItemTagReferences;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-
+import com.mojang.authlib.properties.PropertyMap;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import org.apache.commons.lang3.Validate;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public class Head {
 

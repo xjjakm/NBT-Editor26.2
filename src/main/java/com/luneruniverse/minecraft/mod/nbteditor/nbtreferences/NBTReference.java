@@ -1,24 +1,23 @@
 package com.luneruniverse.minecraft.mod.nbteditor.nbtreferences;
 
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
-
 import com.luneruniverse.minecraft.mod.nbteditor.NBTEditorClient;
 import com.luneruniverse.minecraft.mod.nbteditor.localnbt.LocalNBT;
 import com.luneruniverse.minecraft.mod.nbteditor.nbtreferences.itemreferences.HandItemReference;
 import com.luneruniverse.minecraft.mod.nbteditor.nbtreferences.itemreferences.ItemReference;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
+
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 
 public interface NBTReference<T extends LocalNBT> {
 	public static CompletableFuture<? extends Optional<? extends NBTReference<?>>> getReference(NBTReferenceFilter filter, boolean airable) {
@@ -61,12 +60,10 @@ public interface NBTReference<T extends LocalNBT> {
 	}
 	
 	public static void getReference(NBTReferenceFilter filter, boolean airable, Consumer<NBTReference<?>> consumer) {
-		NBTReference.getReference(filter, airable).thenAccept(ref -> MainUtil.client.execute(() -> {
-			ref.ifPresentOrElse(consumer, () -> {
-				if (MainUtil.client.player != null)
-					MainUtil.client.player.sendSystemMessage(filter.getFailMessage());
-			});
-		}));
+		NBTReference.getReference(filter, airable).thenAccept(ref -> MainUtil.client.execute(() -> ref.ifPresentOrElse(consumer, () -> {
+            if (MainUtil.client.player != null)
+                MainUtil.client.player.sendSystemMessage(filter.getFailMessage());
+        })));
 	}
 	
 	public boolean exists();

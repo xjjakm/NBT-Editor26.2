@@ -1,14 +1,13 @@
 package com.luneruniverse.minecraft.mod.nbteditor.screens.widgets;
 
+import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
+import com.mojang.brigadier.suggestion.Suggestions;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.network.chat.Component;
+
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
-
-import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
-import com.mojang.brigadier.suggestion.Suggestions;
-
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.network.chat.Component;
 
 public class StringInput extends GroupWidget implements InputOverlay.Input<String> {
 	
@@ -72,7 +71,7 @@ public class StringInput extends GroupWidget implements InputOverlay.Input<Strin
 		clearWidgets();
 		
 		String prevValue = (value == null ? defaultValue : value.getValue());
-		value = new SuggestingTextFieldWidget(MainUtil.client.screen, x, y, getWidth(), getHeight());
+		value = new SuggestingTextFieldWidget(MainUtil.client.gui.screen(), x, y, getWidth(), getHeight());
 		value.setMaxLength(Integer.MAX_VALUE);
 		value.setValue(prevValue);
 		if (placeholder != null)
