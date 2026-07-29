@@ -1,6 +1,8 @@
 package com.luneruniverse.minecraft.mod.nbteditor.localnbt;
 
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Attempt;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVDrawableHelper;
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVRegistry;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.nbt.manager.NBTManagers;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
@@ -20,8 +22,12 @@ import java.util.Set;
 public class LocalItemStack extends LocalItem {
 	
 	public static LocalItemStack deserialize(CompoundTag nbt, int defaultDataVersion) {
-		return new LocalItemStack(NBTManagers.ITEM.deserialize(
-				MainUtil.updateDynamic(References.ITEM_STACK, nbt, defaultDataVersion), true));
+		CompoundTag updatedNbt = MainUtil.updateDynamic(References.ITEM_STACK, nbt, defaultDataVersion);
+		Attempt<ItemStack> attempt = NBTManagers.ITEM.tryDeserialize(updatedNbt);
+		if (!attempt.isSuccessful()) {
+			attempt = MVMisc.withDefaultRegistryManager(() -> NBTManagers.ITEM.tryDeserialize(updatedNbt));
+		}
+		return new LocalItemStack(attempt.value().orElse(ItemStack.EMPTY));
 	}
 	
 	private ItemStack item;
@@ -98,7 +104,7 @@ public class LocalItemStack extends LocalItem {
 	
 	@Override
 	public CompoundTag getNBT() {
-		return NBTManagers.ITEM.serialize(item,true);
+		return NBTManagers.ITEM.trySerialize(item).value().orElseGet(CompoundTag::new);
 	}
 	@Override
 	public void setNBT(CompoundTag nbt) {
@@ -120,7 +126,7 @@ public class LocalItemStack extends LocalItem {
 	}
 	@Override
 	public CompoundTag serialize() {
-		CompoundTag output = NBTManagers.ITEM.serialize(item,true);
+		CompoundTag output = NBTManagers.ITEM.trySerialize(item).value().orElseGet(CompoundTag::new);
 		output.putString("type", "item");
 		return output;
 	}

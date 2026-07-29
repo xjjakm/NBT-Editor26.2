@@ -618,7 +618,7 @@ public class ClientChest {
 				dynamicItems.add(i, itemNbt, false);
 				empty = false;
 			} else {
-				items[i] = MVMisc.withDefaultRegistryManager(() -> NBTManagers.ITEM.deserialize(itemNbt, true));
+				items[i] = MVMisc.withDefaultRegistryManager(() -> NBTManagers.ITEM.tryDeserialize(itemNbt)).value().orElse(ItemStack.EMPTY);
 				if (empty && items[i] != null && !items[i].isEmpty())
 					empty = false;
 			}
@@ -775,7 +775,7 @@ public class ClientChest {
 				empty = false;
 			} else {
 				final CompoundTag finalItemNbt = itemNbt;
-				items[i] = MVMisc.withDefaultRegistryManager(() -> NBTManagers.ITEM.deserialize(finalItemNbt, true));
+				items[i] = MVMisc.withDefaultRegistryManager(() -> NBTManagers.ITEM.tryDeserialize(finalItemNbt)).value().orElse(ItemStack.EMPTY);
 				if (empty && items[i] != null && !items[i].isEmpty())
 					empty = false;
 			}

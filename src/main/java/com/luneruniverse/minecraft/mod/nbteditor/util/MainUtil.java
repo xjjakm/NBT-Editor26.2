@@ -325,10 +325,10 @@ public class MainUtil {
 		if (NBTManagers.COMPONENTS_EXIST)
 			return item.transmuteCopy(type, count);
 		
-		CompoundTag fullData = NBTManagers.ITEM.serialize(item,true);
+		CompoundTag fullData = NBTManagers.ITEM.trySerialize(item).value().orElseGet(CompoundTag::new);
 		fullData.putString("id", MVRegistry.ITEM.getId(type).toString());
 		fullData.putInt("Count", count);
-		return NBTManagers.ITEM.deserialize(fullData, true);
+		return NBTManagers.ITEM.tryDeserialize(fullData).value().orElse(ItemStack.EMPTY);
 	}
 	public static ItemStack setType(Item type, ItemStack item) {
 		return setType(type, item, item.getCount());
