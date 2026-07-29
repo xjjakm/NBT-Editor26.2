@@ -1,7 +1,6 @@
 # NBT-Editor - 26.2
 
 This mod can run on MC version 26.2,I know the code has a lot of issues, but the main functions can run.
-supports the latest Vulkan rendering API.
 
 If you have any suggestions for changes, please create a pull request.
 
