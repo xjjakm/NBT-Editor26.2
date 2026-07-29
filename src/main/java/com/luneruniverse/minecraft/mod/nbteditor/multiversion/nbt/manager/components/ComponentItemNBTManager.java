@@ -2,10 +2,11 @@ package com.luneruniverse.minecraft.mod.nbteditor.multiversion.nbt.manager.compo
 
 import com.luneruniverse.minecraft.mod.nbteditor.misc.MixinLink;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Attempt;
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.DynamicRegistryManagerHolder;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.nbt.manager.DeserializableNBTManager;
-import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
@@ -21,13 +22,21 @@ import java.util.stream.Collectors;
 
 public class ComponentItemNBTManager implements DeserializableNBTManager<ItemStack> {
 	
+	private static HolderLookup.Provider getLookup() {
+		try {
+			return DynamicRegistryManagerHolder.getManager();
+		} catch (RuntimeException e) {
+			return VanillaRegistries.createLookup();
+		}
+	}
+	
 	@Override
 	public Attempt<CompoundTag> trySerialize(ItemStack subject) {
 		if (subject.isEmpty())
 			return new Attempt<>(new CompoundTag());
 		
 		DataResult<Tag> result = ItemStack.CODEC.encodeStart(
-				(MainUtil.client.getConnection() == null ? VanillaRegistries.createLookup() : MainUtil.client.getConnection().registryAccess()).createSerializationContext(NbtOps.INSTANCE), subject);
+				getLookup().createSerializationContext(NbtOps.INSTANCE), subject);
 		return new Attempt<>(
 				result.resultOrPartial().map(nbt -> (CompoundTag) nbt.copy()),
 				result.error().map(DataResult.Error::message).orElse(null));
@@ -40,7 +49,7 @@ public class ComponentItemNBTManager implements DeserializableNBTManager<ItemSta
 			return new Attempt<>(ItemStack.EMPTY);
 		
 		DataResult<Pair<ItemStack, Tag>> result = ItemStack.OPTIONAL_CODEC.decode(
-				(MainUtil.client.getConnection() == null ? VanillaRegistries.createLookup() : MainUtil.client.getConnection().registryAccess()).createSerializationContext(NbtOps.INSTANCE), nbt.copy());
+				getLookup().createSerializationContext(NbtOps.INSTANCE), nbt.copy());
 		return new Attempt<>(
 				result.resultOrPartial().map(Pair::getFirst).map(item -> {
 					if (item.has(DataComponents.MAX_DAMAGE) && item.getOrDefault(DataComponents.MAX_STACK_SIZE, 1) > 1)
@@ -57,7 +66,7 @@ public class ComponentItemNBTManager implements DeserializableNBTManager<ItemSta
 	@Override
 	public CompoundTag getNbt(ItemStack subject) {
 		return (CompoundTag) DataComponentPatch.CODEC.encodeStart(
-				(MainUtil.client.getConnection() == null ? VanillaRegistries.createLookup() : MainUtil.client.getConnection().registryAccess()).createSerializationContext(NbtOps.INSTANCE), subject.getComponentsPatch()).getOrThrow().copy();
+				getLookup().createSerializationContext(NbtOps.INSTANCE), subject.getComponentsPatch()).getOrThrow().copy();
 	}
 	@Override
 	public CompoundTag getOrCreateNbt(ItemStack subject) {
@@ -66,7 +75,7 @@ public class ComponentItemNBTManager implements DeserializableNBTManager<ItemSta
 	@Override
 	public void setNbt(ItemStack subject, CompoundTag nbt) {
 		DataComponentPatch components = DataComponentPatch.CODEC.decode(
-				(MainUtil.client.getConnection() == null ? VanillaRegistries.createLookup() : MainUtil.client.getConnection().registryAccess()).createSerializationContext(NbtOps.INSTANCE), nbt.copy()).getPartialOrThrow().getFirst();
+				getLookup().createSerializationContext(NbtOps.INSTANCE), nbt.copy()).getPartialOrThrow().getFirst();
 		Map<DataComponentType<?>, Optional<?>> componentMap = components.entrySet().stream()
 				.collect(Collectors.toMap(
 						Map.Entry::getKey,
@@ -108,7 +117,7 @@ public class ComponentItemNBTManager implements DeserializableNBTManager<ItemSta
 	@SuppressWarnings("unchecked")
 	private <T> DataResult<Tag> encodeComponent(DataComponentType<T> component, Object value) {
 		return component.codecOrThrow().encodeStart(
-				(MainUtil.client.getConnection() == null ? VanillaRegistries.createLookup() : MainUtil.client.getConnection().registryAccess()).createSerializationContext(NbtOps.INSTANCE), (T) value);
+				getLookup().createSerializationContext(NbtOps.INSTANCE), (T) value);
 	}
 	
 }

@@ -3,6 +3,8 @@ package com.luneruniverse.minecraft.mod.nbteditor.util;
 import java.util.WeakHashMap;
 
 import com.luneruniverse.minecraft.mod.nbteditor.clientchest.DynamicItems;
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Attempt;
+import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.nbt.manager.NBTManagers;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.networking.MVClientNetworking;
 
@@ -41,7 +43,10 @@ public class SingleDynamicItem {
 	public synchronized CompoundTag getOriginalNbt() {
 		if (items.isSlot(SLOT))
 			return items.getOriginalNbt(SLOT);
-		return NBTManagers.ITEM.serialize(item,true);
+		Attempt<CompoundTag> attempt = NBTManagers.ITEM.trySerialize(item);
+		if (!attempt.isSuccessful())
+			attempt = MVMisc.withDefaultRegistryManager(() -> NBTManagers.ITEM.trySerialize(item));
+		return attempt.value().orElseGet(CompoundTag::new);
 	}
 	
 	public synchronized boolean isDynamic() {

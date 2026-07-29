@@ -2,6 +2,7 @@ package com.luneruniverse.minecraft.mod.nbteditor.misc;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.luneruniverse.minecraft.mod.nbteditor.NBTEditor;
 import com.luneruniverse.minecraft.mod.nbteditor.NBTEditorClient;
 import com.luneruniverse.minecraft.mod.nbteditor.async.ItemSize;
 import com.luneruniverse.minecraft.mod.nbteditor.commands.get.GetLostItemCommand;
@@ -179,7 +180,8 @@ public class MixinLink {
 		
 		if (actionType == ContainerInput.PICKUP && slot != null &&
 				(slot.container == MainUtil.client.player.getInventory() || !creativeInv) &&
-				(!(source instanceof InventoryScreen) || slot.index > 4)) {
+				(!(source instanceof InventoryScreen) || slot.index > 4) &&
+				NBTEditor.hasControlDown()) {
 			ItemStack cursor = source.getMenu().getCarried();
 			ItemStack item = slot.getItem();
 			if (cursor == null || cursor.isEmpty() || item == null || item.isEmpty())

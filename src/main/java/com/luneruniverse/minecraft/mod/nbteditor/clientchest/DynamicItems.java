@@ -31,7 +31,16 @@ public class DynamicItems {
 		if (item.isEmpty())
 			return ItemStack.EMPTY;
 		
-		CompoundTag nbt = NBTManagers.ITEM.serialize(item, true);
+		Attempt<CompoundTag> nbtAttempt = NBTManagers.ITEM.trySerialize(item);
+		if (!nbtAttempt.isSuccessful()) {
+			// Retry with default registry manager; the item's holders may be from the default manager
+			nbtAttempt = MVMisc.withDefaultRegistryManager(() -> NBTManagers.ITEM.trySerialize(item));
+		}
+		if (!nbtAttempt.isSuccessful()) {
+			add(slot, new CompoundTag(), false);
+			return item;
+		}
+		CompoundTag nbt = nbtAttempt.getSuccessOrThrow();
 		Attempt<ItemStack> defaultRegistryItem = MVMisc.withDefaultRegistryManager(() -> NBTManagers.ITEM.tryDeserialize(nbt));
 		
 		if (defaultRegistryItem.isSuccessful())
