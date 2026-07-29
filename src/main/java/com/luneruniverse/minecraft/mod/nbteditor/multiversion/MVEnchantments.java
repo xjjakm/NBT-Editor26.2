@@ -6,6 +6,8 @@ import java.util.function.Supplier;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.ItemTagReferences;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific.data.Enchants;
 
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.ItemStack;
@@ -47,7 +49,14 @@ public class MVEnchantments {
 	
 	public static void addEnchantment(ItemStack item, Enchantment enchant, int level) {
 		Enchants enchants = ItemTagReferences.ENCHANTMENTS.get(item);
-		enchants.addEnchant(enchant, level);
+		// Find a serializable Holder.Reference instead of relying on wrapAsHolder
+		// which may return Holder.Direct and cause "can't be serialized to a value"
+		Registry<Enchantment> registry = MVRegistry.getEnchantmentRegistry().getInternalValue();
+		Holder<Enchantment> holder = registry.getResourceKey(enchant)
+				.flatMap(registry::get)
+				.map(h -> (Holder<Enchantment>) h)
+				.orElseGet(() -> registry.wrapAsHolder(enchant));
+		enchants.addEnchant(holder, level);
 		ItemTagReferences.ENCHANTMENTS.set(item, enchants);
 	}
 	

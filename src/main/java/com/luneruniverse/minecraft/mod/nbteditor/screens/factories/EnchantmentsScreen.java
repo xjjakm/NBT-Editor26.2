@@ -40,15 +40,20 @@ public class EnchantmentsScreen extends LocalEditorScreen<LocalItem> {
 		super(TextInst.of("Enchantments"), ref);
 		
 		MVRegistry<Enchantment> registry = MVRegistry.getEnchantmentRegistry();
-		Map<String, Enchantment> allEnchantments = registry.getEntrySet().stream()
-				.map(enchant -> Map.entry(enchant.getKey().toString(), enchant.getValue()))
+		Map<String, Holder<Enchantment>> allEnchantments = new LinkedHashMap<>();
+		for (Holder<Enchantment> holder : registry.getInternalValue().asHolderIdMap()) {
+			Identifier id = registry.getId(holder.value());
+			if (id != null)
+				allEnchantments.put(id.toString(), holder);
+		}
+		final Map<String, Holder<Enchantment>> sortedEnchantments = allEnchantments.entrySet().stream()
 				.sorted((a, b) -> a.getKey().compareToIgnoreCase(b.getKey()))
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> a, LinkedHashMap::new));
 		
 		ItemStack inputItem = ref.getItem();
 		ConfigCategory entry = new ConfigCategory();
-		List<String> orderedEnchants = allEnchantments.entrySet().stream()
-				.map(enchant -> Map.entry(enchant.getKey(), enchant.getValue().canEnchant(inputItem)))
+		List<String> orderedEnchants = sortedEnchantments.entrySet().stream()
+				.map(enchant -> Map.entry(enchant.getKey(), enchant.getValue().value().canEnchant(inputItem)))
 				.sorted((a, b) -> {
 					if (a.getValue()) {
 						if (!b.getValue())
@@ -61,7 +66,7 @@ public class EnchantmentsScreen extends LocalEditorScreen<LocalItem> {
 		String firstEnchant = orderedEnchants.get(0);
 		entry.setConfigurable("enchantment", new ConfigItem<>(TextInst.translatable("nbteditor.enchantments.enchantment"),
 				ConfigValueDropdown.forList(firstEnchant, firstEnchant, orderedEnchants,
-				allEnchantments.entrySet().stream().filter(enchant -> enchant.getValue().canEnchant(inputItem)).map(Map.Entry::getKey).toList())));
+				sortedEnchantments.entrySet().stream().filter(enchant -> enchant.getValue().value().canEnchant(inputItem)).map(Map.Entry::getKey).toList())));
 		entry.setConfigurable("level", new ConfigItem<>(TextInst.translatable("nbteditor.enchantments.level"),
 				ConfigValueNumber.forInt(1, 1, 1,
 						Version.<Integer>newSwitch()
@@ -72,13 +77,17 @@ public class EnchantmentsScreen extends LocalEditorScreen<LocalItem> {
 
 		ItemTagReferences.ENCHANTMENTS.get(localNBT.getEditableItem()).enchants().forEach(enchant -> {
 			ConfigCategory enchantConfig = entry.clone(true);
-			Identifier id = null;
-			for(Holder<Enchantment> e : registry.getInternalValue().asHolderIdMap()) {
-				if(e.value().description().getString().equals(enchant.enchant().description().getString())) {
-					id = registry.getId(e.value());
+			// Use the holder's key directly instead of searching by description
+			Identifier id = enchant.enchantHolder().unwrapKey().map(key -> key.identifier()).orElse(null);
+			if (id == null) {
+				// Fallback: search by description match
+				for (Holder<Enchantment> e : registry.getInternalValue().asHolderIdMap()) {
+					if(e.value().description().getString().equals(enchant.enchant().description().getString())) {
+						id = registry.getId(e.value());
+					}
 				}
 			}
-			getConfigEnchantment(enchantConfig).setValue(id.toString());
+			getConfigEnchantment(enchantConfig).setValue(id != null ? id.toString() : "");
 			getConfigLevel(enchantConfig).setValue(enchant.level());
 			config.addConfigurable(enchantConfig);
 		});
@@ -88,7 +97,7 @@ public class EnchantmentsScreen extends LocalEditorScreen<LocalItem> {
 			for (ConfigPath path : config.getConfigurables().values()) {
 				ConfigCategory enchant = (ConfigCategory) path;
 				newEnchants.add(new Enchants.EnchantWithLevel(
-						allEnchantments.get(getConfigEnchantment(enchant).getValidValue()),
+						sortedEnchantments.get(getConfigEnchantment(enchant).getValidValue()),
 						getConfigLevel(enchant).getValidValue()));
 			}
 			ItemTagReferences.ENCHANTMENTS.set(localNBT.getEditableItem(), new Enchants(newEnchants));

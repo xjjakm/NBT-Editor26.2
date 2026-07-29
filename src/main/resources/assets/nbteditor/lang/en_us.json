@@ -609,5 +609,7 @@
 	"nbteditor.hdb.category.humanoid": "humanoid",
 	"nbteditor.hdb.category.miscellaneous": "miscellaneous",
 	"nbteditor.hdb.category.monsters": "monsters",
-	"nbteditor.hdb.category.plants": "plants"
+	"nbteditor.hdb.category.plants": "plants",
+
+	"modmenu.descriptionTranslation.nbteditor": "Lets you edit items, blocks, and entities ingame, store items in a client side chest, open containers in your inventory, and more!"
 }

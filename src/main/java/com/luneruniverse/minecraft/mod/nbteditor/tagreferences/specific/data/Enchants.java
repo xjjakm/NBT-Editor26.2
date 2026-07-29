@@ -1,12 +1,21 @@
 package com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific.data;
 
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.enchantment.Enchantment;
 
 import java.util.*;
 
 public record Enchants(List<EnchantWithLevel> enchants) {
 
-    public static record EnchantWithLevel(Enchantment enchant, int level) {
+    /**
+     * Holds the enchantment as a Holder to preserve registry context.
+     * Using Holder.Direct (from wrapAsHolder) causes serialization failures
+     * because RegistryFixedCodec can't serialize holders without a ResourceKey.
+     */
+    public static record EnchantWithLevel(Holder<Enchantment> enchantHolder, int level) {
+        public Enchantment enchant() {
+            return enchantHolder.value();
+        }
     }
 
     public Enchants() {
@@ -27,8 +36,8 @@ public record Enchants(List<EnchantWithLevel> enchants) {
                 .mapToInt(EnchantWithLevel::level).max().orElse(0);
     }
 
-    public void addEnchant(Enchantment enchant, int level) {
-        enchants.add(new EnchantWithLevel(enchant, level));
+    public void addEnchant(Holder<Enchantment> enchantHolder, int level) {
+        enchants.add(new EnchantWithLevel(enchantHolder, level));
     }
 
     public void addEnchant(EnchantWithLevel enchant) {
@@ -51,9 +60,9 @@ public record Enchants(List<EnchantWithLevel> enchants) {
     }
 
     public boolean removeDuplicates() {
-        Map<Enchantment, Integer> enchants = new LinkedHashMap<>();
+        Map<Holder<Enchantment>, Integer> enchants = new LinkedHashMap<>();
         for (EnchantWithLevel enchant : this.enchants)
-            enchants.put(enchant.enchant(), enchant.level());
+            enchants.put(enchant.enchantHolder(), enchant.level());
         if (this.enchants.size() == enchants.size())
             return false;
         this.enchants.clear();
@@ -61,30 +70,43 @@ public record Enchants(List<EnchantWithLevel> enchants) {
         return true;
     }
 
-    public boolean setEnchant(Enchantment enchant, int level, boolean onlyUpgrade) {
-        if (onlyUpgrade && level <= getLevel(enchant)) {
+    public boolean setEnchant(Holder<Enchantment> enchantHolder, int level, boolean onlyUpgrade) {
+        if (onlyUpgrade && level <= getLevel(enchantHolder.value())) {
             return false;
         }
 
         boolean found = false;
         for (ListIterator<EnchantWithLevel> iter = enchants.listIterator(); iter.hasNext(); ) {
             EnchantWithLevel enchantWithLevel = iter.next();
-            if (enchantWithLevel.enchant() != enchant)
+            if (enchantWithLevel.enchantHolder() != enchantHolder)
                 continue;
             if (found)
                 iter.remove();
             else {
-                iter.set(new EnchantWithLevel(enchant, level));
+                iter.set(new EnchantWithLevel(enchantHolder, level));
                 found = true;
             }
         }
         if (!found)
-            addEnchant(enchant, level);
+            addEnchant(enchantHolder, level);
         return true;
     }
 
+    /**
+     * Backward-compatible overload that finds the Holder from the Enchantment instance.
+     * Prefer the Holder overload to avoid creating unserializable Holder.Direct instances.
+     */
+    public boolean setEnchant(Enchantment enchant, int level, boolean onlyUpgrade) {
+        var registry = com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVRegistry.getEnchantmentRegistry().getInternalValue();
+        var holder = registry.getResourceKey(enchant)
+                .flatMap(registry::get)
+                .map(h -> (net.minecraft.core.Holder<Enchantment>) h)
+                .orElseGet(() -> registry.wrapAsHolder(enchant));
+        return setEnchant(holder, level, onlyUpgrade);
+    }
+
     public void setEnchant(EnchantWithLevel enchant, boolean onlyUpgrade) {
-        setEnchant(enchant.enchant(), enchant.level(), onlyUpgrade);
+        setEnchant(enchant.enchantHolder(), enchant.level(), onlyUpgrade);
     }
 
     public void setEnchants(Collection<EnchantWithLevel> enchants, boolean onlyUpgrade) {

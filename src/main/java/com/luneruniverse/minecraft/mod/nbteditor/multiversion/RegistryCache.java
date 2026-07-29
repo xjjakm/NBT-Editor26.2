@@ -28,6 +28,10 @@ public class RegistryCache {
 	
 	private static final Supplier<Reflection.MethodInvoker> Registry_getEntry =
 			Reflection.getOptionalMethod(Registry.class, "method_55841", MethodType.methodType(Optional.class, Identifier.class));
+	private static final boolean IS_1_21_2_PLUS = Version.<Boolean>newSwitch()
+			.range("1.21.2", null, true)
+			.range(null, "1.21.1", false)
+			.get();
 	/**
 	 * @return May be null
 	 */
@@ -39,11 +43,10 @@ public class RegistryCache {
 		if (registry == null)
 			return null;
 		
-		return Version.<Optional<Holder.Reference<T>>>newSwitch()
-				.range("1.21.2", null, () -> registry.get(ref.key().identifier()))
-				.range(null, "1.21.1", () -> Registry_getEntry.get().invoke(registry, ref.key().identifier()))
-				.get()
-				.orElse(null);
+		if (IS_1_21_2_PLUS)
+			return registry.get(ref.key().identifier()).orElse(null);
+		else
+			return ((Optional<Holder.Reference<T>>) Registry_getEntry.get().invoke(registry, ref.key().identifier())).orElse(null);
 	}
 	
 	private static final Supplier<Reflection.MethodInvoker> Registry_getKey =

@@ -104,7 +104,10 @@ public class LocalItemStack extends LocalItem {
 	
 	@Override
 	public CompoundTag getNBT() {
-		return NBTManagers.ITEM.trySerialize(item).value().orElseGet(CompoundTag::new);
+		Attempt<CompoundTag> attempt = NBTManagers.ITEM.trySerialize(item);
+		if (!attempt.isSuccessful())
+			attempt = MVMisc.withDefaultRegistryManager(() -> NBTManagers.ITEM.trySerialize(item));
+		return attempt.value().orElseGet(CompoundTag::new);
 	}
 	@Override
 	public void setNBT(CompoundTag nbt) {
@@ -126,7 +129,10 @@ public class LocalItemStack extends LocalItem {
 	}
 	@Override
 	public CompoundTag serialize() {
-		CompoundTag output = NBTManagers.ITEM.trySerialize(item).value().orElseGet(CompoundTag::new);
+		Attempt<CompoundTag> attempt = NBTManagers.ITEM.trySerialize(item);
+		if (!attempt.isSuccessful())
+			attempt = MVMisc.withDefaultRegistryManager(() -> NBTManagers.ITEM.trySerialize(item));
+		CompoundTag output = attempt.value().orElseGet(CompoundTag::new);
 		output.putString("type", "item");
 		return output;
 	}

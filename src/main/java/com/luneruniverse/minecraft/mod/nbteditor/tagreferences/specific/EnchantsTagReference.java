@@ -2,7 +2,6 @@ package com.luneruniverse.minecraft.mod.nbteditor.tagreferences.specific;
 
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVComponentType;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVMisc;
-import com.luneruniverse.minecraft.mod.nbteditor.multiversion.MVRegistry;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.general.ComponentTagReference;
 import com.luneruniverse.minecraft.mod.nbteditor.tagreferences.general.TagReference;
@@ -21,10 +20,12 @@ public class EnchantsTagReference implements TagReference<Enchants, ItemStack> {
 				.range("1.20.5", null, () -> new ComponentTagReference<>(component,
 						null,
 						componentValue -> componentValue == null ? new Enchants() : new Enchants(componentValue.entrySet().stream()
-								.map(entry -> new Enchants.EnchantWithLevel(entry.getKey().value(), entry.getIntValue())).collect(Collectors.toList())),
+								// Preserve the original Holder to avoid creating unserializable Holder.Direct instances
+								.map(entry -> new Enchants.EnchantWithLevel(entry.getKey(), entry.getIntValue())).collect(Collectors.toList())),
 						(componentValue, enchants) -> (ItemEnchantments) MVMisc.withEnchantments(componentValue,
+								// Use the preserved Holder directly instead of recreating via wrapAsHolder
 								new Object2IntOpenHashMap<>(enchants.enchants().stream().collect(Collectors.toMap(
-										enchant -> MVRegistry.getEnchantmentRegistry().getInternalValue().wrapAsHolder(enchant.enchant()),
+										Enchants.EnchantWithLevel::enchantHolder,
 										enchant -> Math.min(255, enchant.level()),
 										Math::max))))))
 				.get();

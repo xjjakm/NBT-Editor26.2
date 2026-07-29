@@ -615,5 +615,7 @@
 	"nbteditor.hdb.category.humanoid": "人型生物",
 	"nbteditor.hdb.category.miscellaneous": "杂项",
 	"nbteditor.hdb.category.monsters": "怪物",
-	"nbteditor.hdb.category.plants": "植物"
+	"nbteditor.hdb.category.plants": "植物",
+
+	"modmenu.descriptionTranslation.nbteditor": "让你在游戏中编辑物品、方块和实体，将物品存储在客户端箱子中，在你的背包中打开容器，等等！"
 }

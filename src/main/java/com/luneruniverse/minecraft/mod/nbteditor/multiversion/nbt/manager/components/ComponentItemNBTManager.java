@@ -65,12 +65,14 @@ public class ComponentItemNBTManager implements DeserializableNBTManager<ItemSta
 	}
 	@Override
 	public CompoundTag getNbt(ItemStack subject) {
-		return (CompoundTag) DataComponentPatch.CODEC.encodeStart(
-				getLookup().createSerializationContext(NbtOps.INSTANCE), subject.getComponentsPatch()).getOrThrow().copy();
+		DataResult<Tag> result = DataComponentPatch.CODEC.encodeStart(
+				getLookup().createSerializationContext(NbtOps.INSTANCE), subject.getComponentsPatch());
+		return (CompoundTag) result.resultOrPartial().map(Tag::copy).orElse(null);
 	}
 	@Override
 	public CompoundTag getOrCreateNbt(ItemStack subject) {
-		return getNbt(subject);
+		CompoundTag nbt = getNbt(subject);
+		return nbt != null ? nbt : new CompoundTag();
 	}
 	@Override
 	public void setNbt(ItemStack subject, CompoundTag nbt) {
