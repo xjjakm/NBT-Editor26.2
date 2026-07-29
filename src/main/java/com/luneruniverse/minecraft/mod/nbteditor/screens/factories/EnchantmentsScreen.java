@@ -46,14 +46,23 @@ public class EnchantmentsScreen extends LocalEditorScreen<LocalItem> {
 			if (id != null)
 				allEnchantments.put(id.toString(), holder);
 		}
-		final Map<String, Holder<Enchantment>> sortedEnchantments = allEnchantments.entrySet().stream()
+		// 显示名称 → id 的映射，用于下拉框显示各种语言
+		Map<String, String> displayNameToId = new LinkedHashMap<>();
+		Map<String, String> idToDisplayName = new LinkedHashMap<>();
+		for (Map.Entry<String, Holder<Enchantment>> e : allEnchantments.entrySet()) {
+			String displayName = e.getValue().value().description().getString();
+			displayNameToId.put(displayName, e.getKey());
+			idToDisplayName.put(e.getKey(), displayName);
+		}
+		// 按显示名称排序
+		final Map<String, String> sortedDisplayNameToId = displayNameToId.entrySet().stream()
 				.sorted((a, b) -> a.getKey().compareToIgnoreCase(b.getKey()))
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> a, LinkedHashMap::new));
 		
 		ItemStack inputItem = ref.getItem();
 		ConfigCategory entry = new ConfigCategory();
-		List<String> orderedEnchants = sortedEnchantments.entrySet().stream()
-				.map(enchant -> Map.entry(enchant.getKey(), enchant.getValue().value().canEnchant(inputItem)))
+		List<String> orderedEnchants = sortedDisplayNameToId.entrySet().stream()
+				.map(enchant -> Map.entry(enchant.getKey(), allEnchantments.get(enchant.getValue()).value().canEnchant(inputItem)))
 				.sorted((a, b) -> {
 					if (a.getValue()) {
 						if (!b.getValue())
@@ -66,7 +75,7 @@ public class EnchantmentsScreen extends LocalEditorScreen<LocalItem> {
 		String firstEnchant = orderedEnchants.get(0);
 		entry.setConfigurable("enchantment", new ConfigItem<>(TextInst.translatable("nbteditor.enchantments.enchantment"),
 				ConfigValueDropdown.forList(firstEnchant, firstEnchant, orderedEnchants,
-				sortedEnchantments.entrySet().stream().filter(enchant -> enchant.getValue().value().canEnchant(inputItem)).map(Map.Entry::getKey).toList())));
+				sortedDisplayNameToId.entrySet().stream().filter(enchant -> allEnchantments.get(enchant.getValue()).value().canEnchant(inputItem)).map(Map.Entry::getKey).toList())));
 		entry.setConfigurable("level", new ConfigItem<>(TextInst.translatable("nbteditor.enchantments.level"),
 				ConfigValueNumber.forInt(1, 1, 1,
 						Version.<Integer>newSwitch()
@@ -87,7 +96,9 @@ public class EnchantmentsScreen extends LocalEditorScreen<LocalItem> {
 					}
 				}
 			}
-			getConfigEnchantment(enchantConfig).setValue(id != null ? id.toString() : "");
+			// 显示名称而不是 id
+			String displayName = id != null ? idToDisplayName.getOrDefault(id.toString(), id.toString()) : "";
+			getConfigEnchantment(enchantConfig).setValue(displayName);
 			getConfigLevel(enchantConfig).setValue(enchant.level());
 			config.addConfigurable(enchantConfig);
 		});
@@ -96,8 +107,10 @@ public class EnchantmentsScreen extends LocalEditorScreen<LocalItem> {
 			List<Enchants.EnchantWithLevel> newEnchants = new ArrayList<>();
 			for (ConfigPath path : config.getConfigurables().values()) {
 				ConfigCategory enchant = (ConfigCategory) path;
+				String displayName = getConfigEnchantment(enchant).getValidValue();
+				String enchantId = sortedDisplayNameToId.getOrDefault(displayName, displayName);
 				newEnchants.add(new Enchants.EnchantWithLevel(
-						sortedEnchantments.get(getConfigEnchantment(enchant).getValidValue()),
+						allEnchantments.get(enchantId),
 						getConfigLevel(enchant).getValidValue()));
 			}
 			ItemTagReferences.ENCHANTMENTS.set(localNBT.getEditableItem(), new Enchants(newEnchants));
