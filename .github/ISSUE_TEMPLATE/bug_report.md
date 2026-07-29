@@ -11,7 +11,7 @@ assignees: xjjakm
 
 - **Have you ensured that all of your mods are up-to-date?** Please use the latest version of this mod from GitHub Actions.
 
-- **Have you used the [search tool](https://github.com/xjjakm/NBT-Editor26.2/issues) to check whether your issue has already been reported?** If it has, then consider it.
+- **Have you used the [search tool](https://github.com/xjjakm/NBT-Editor26.2/issues) to check whether your issue has already been reported?** If it has been, then consider adding more information to the existing issue instead.
 
 - **Have you determined the minimum set of instructions to reproduce the issue?** If your problem only occurs with other mods installed, then you should narrow down exactly which mods are causing the issue. Please do not provide your entire list of mods to us and expect that we will be able to figure out the problem.
 
