@@ -572,8 +572,30 @@ public class MVMisc {
 	public static boolean isChatFormattingColor(ChatFormatting formatting) {
 		return net.minecraft.network.chat.TextColor.fromLegacyFormat(formatting) != null;
 	}
+	/**
+	 * Translation key for ChatFormatting display name.
+	 * Colors use {@code nbteditor.chat_color.<name>}, format codes use {@code nbteditor.chat_formatting.<name>}.
+	 */
+	public static String getChatFormattingTranslationKey(ChatFormatting formatting) {
+		String base = formatting.name().toLowerCase(java.util.Locale.ROOT);
+		boolean isColor = net.minecraft.network.chat.TextColor.fromLegacyFormat(formatting) != null;
+		return (isColor ? "nbteditor.chat_color." : "nbteditor.chat_formatting.") + base;
+	}
+	/**
+	 * Returns the raw English fallback name (used where translation is missing).
+	 */
 	public static String getChatFormattingName(ChatFormatting formatting) {
 		return formatting.name().toLowerCase(java.util.Locale.ROOT);
+	}
+	/**
+	 * Returns a translatable component for the ChatFormatting display name
+	 * (colors: 黑色/深蓝/... ; format: 粗体/斜体/...).
+	 * Falls back to the raw English name when no translation is present.
+	 */
+	public static net.minecraft.network.chat.MutableComponent getChatFormattingNameComponent(ChatFormatting formatting) {
+		return net.minecraft.network.chat.Component.translatableWithFallback(
+				getChatFormattingTranslationKey(formatting),
+				getChatFormattingName(formatting));
 	}
 
 	public static CreativeModeInventoryScreen newCreativeModeInventoryScreen(LocalPlayer player) {

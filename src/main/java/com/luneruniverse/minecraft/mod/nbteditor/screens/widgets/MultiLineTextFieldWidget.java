@@ -6,6 +6,10 @@ import com.luneruniverse.minecraft.mod.nbteditor.screens.OverlaySupportingScreen
 import com.luneruniverse.minecraft.mod.nbteditor.screens.Tickable;
 import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
 import com.luneruniverse.minecraft.mod.nbteditor.util.TextUtil;
+
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import com.mojang.brigadier.suggestion.Suggestions;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
@@ -269,7 +273,62 @@ public class MultiLineTextFieldWidget implements MVDrawable, MVElement, Tickable
 	private ScrollBarWidget scrollBar;
 	
 	private SuggestingTextFieldWidget suggestor;
-	
+
+	// IMBlocker proxy — caches the java.lang.reflect.Proxy returned by
+	// IMBlockerCompat.notifyFocusChange so we remove the same proxy we registered.
+	private transient Object imblockerFocusProxy;
+	// Lazily initialized InvocationHandler for the above proxy.
+	private transient InvocationHandler imblockerProxyHandler;
+
+	private InvocationHandler getIMBlockerProxyHandler() {
+		if (imblockerProxyHandler == null) {
+			imblockerProxyHandler = (proxy, method, args) -> switch (method.getName()) {
+				case "getBoundsAbs" ->
+					IMBlockerCompat.newRectangle(IMBlockerCompat.getGuiScale(), x, y, width, height);
+				case "getCaretPos" -> {
+					Point c = getXYPos(this.cursor);
+					yield IMBlockerCompat.newPoint(IMBlockerCompat.getGuiScale(), c.x, c.y);
+				}
+				case "getGuiScale" -> IMBlockerCompat.getGuiScale();
+				case "isRenderable" -> true; // always rendered when focused
+				case "getFocusContainer" -> null; // will be filled via default method (MINECRAFT)
+				case "getPreferredState" -> true; // want IME enabled
+				case "getPreferredEnglishState" -> false; // prefer Chinese mode
+				case "getFontHeight" -> textRenderer.lineHeight;
+				case "equals" -> proxy == args[0];
+				case "hashCode" -> System.identityHashCode(proxy);
+				case "toString" -> "NBTEditorMultiLineIFWidget@" + System.identityHashCode(proxy);
+				default -> {
+					Class<?> decl = method.getDeclaringClass();
+					if (decl.isInterface()) {
+						// Satisfy default methods the caller does not override:
+						// isTrulyFocused / updateIMState / updateEnglishState / deliverFocus /
+						// lostFocus / imblocker$onFocusChanged / imblocker$onFocusGained /
+						// imblocker$onFocusLost / imblocker$onBoundsChanged / etc.
+						try {
+							yield MethodHandles.privateLookupIn(decl, MethodHandles.lookup())
+									.unreflectSpecial(method, decl)
+									.bindTo(proxy)
+									.invokeWithArguments(args);
+						} catch (Throwable ignored) {
+							// Methods without default implementations: return sensible default
+							yield switch (method.getReturnType().getName()) {
+								case "boolean" -> false;
+								case "int", "short", "byte", "char" -> 0;
+								case "long" -> 0L;
+								case "float" -> 0f;
+								case "double" -> 0d;
+								default -> null;
+							};
+						}
+					}
+					yield null;
+				}
+			};
+		}
+		return imblockerProxyHandler;
+	}
+
 	protected MultiLineTextFieldWidget(int x, int y, int width, int height, String text,
                                        Function<String, Component> formatter, boolean newLines, Consumer<String> onChange) {
 		if(newLines) text = MVMisc.stripInvalidChars(text, true);
@@ -367,13 +426,13 @@ public class MultiLineTextFieldWidget implements MVDrawable, MVElement, Tickable
 	private void syncToSuggestor() {
 		if (!suggestor.value.equals(text))
 			suggestor.setValue(text);
-		
+
 		if (suggestor.getCursorPosition() != cursor)
 			MVMisc.setCursor(suggestor, cursor);
-		
+
 		boolean focus = isMultiFocused();
 		if (suggestor.isMultiFocused() != focus)
-			suggestor.setMultiFocused(focus);
+			suggestor.setFocused(focus); // Use setFocused to trigger IMBlocker's EditBox mixin
 	}
 	private void syncFromSuggestor() {
 		if (!suggestor.value.equals(text))
@@ -964,6 +1023,26 @@ public class MultiLineTextFieldWidget implements MVDrawable, MVElement, Tickable
 	@Override
 	public void updateNarration(NarrationElementOutput var1) {
 		
+	}
+	
+	@Override
+	public void onMultiFocusedSet(boolean focused, boolean prevFocused) {
+		if (focused == prevFocused)
+			return;
+
+		// Try IMBlocker first — if installed it cancels vanilla onTextInputFocusChange.
+		// We register a java.lang.reflect.Proxy implementing MinecraftFocusableWidget
+		// so that IMBlocker's FocusContainer knows about this widget and enables IME
+		// via ImmAssociateContext (Windows) / SDL text input (SDL platforms).
+		Object registered = IMBlockerCompat.notifyFocusChange(
+				getIMBlockerProxyHandler(), focused, imblockerFocusProxy);
+		if (registered != null) {
+			imblockerFocusProxy = focused ? registered : null;
+			return;
+		}
+
+		// Fallback: vanilla Minecraft IME path (no IMBlocker present).
+		net.minecraft.client.Minecraft.getInstance().onTextInputFocusChange(this, focused);
 	}
 	
 }

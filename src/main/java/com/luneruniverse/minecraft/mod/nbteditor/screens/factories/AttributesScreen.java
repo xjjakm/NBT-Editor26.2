@@ -39,7 +39,11 @@ public class AttributesScreen<L extends LocalNBT> extends LocalEditorScreen<L> {
 	private static ConfigButton createExtremeAmountBtn(String key, boolean mostPositive, boolean infinity) {
 		return new ConfigButton(30, TextInst.translatable(key), btn -> {
 			ConfigCategory attribute = (ConfigCategory) btn.getParent().getParent();
-			Attribute type = ATTRIBUTES.get(getConfigAttribute(attribute).getValidValue());
+			String displayName = getConfigAttribute(attribute).getValidValue();
+			String attrId = (DISPLAY_NAME_TO_ID != null)
+					? DISPLAY_NAME_TO_ID.getOrDefault(displayName, displayName)
+					: displayName;
+			Attribute type = ATTRIBUTES.get(attrId);
 			
 			double min = Double.MIN_VALUE;
 			double max = Double.MAX_VALUE;
@@ -65,16 +69,37 @@ public class AttributesScreen<L extends LocalNBT> extends LocalEditorScreen<L> {
 	}
 	
 	private static final Map<String, Attribute> ATTRIBUTES;
+	// 显示名称 → 属性 ID（注册表 path，如 "minecraft:generic.max_health"）
+	private static final Map<String, String> DISPLAY_NAME_TO_ID;
+	// 属性 ID → 显示名称（用于回显，如 "生命上限"）
+	private static final Map<String, String> ID_TO_DISPLAY_NAME;
 	private static final ConfigHiddenDataNamed<ConfigCategory, AttributeModifierId> BASE_ATTRIBUTE_ENTRY;
 	private static final ConfigHiddenDataNamed<ConfigCategory, AttributeModifierId> ATTRIBUTE_ENTRY;
 	static {
-		ATTRIBUTES = MVRegistry.ATTRIBUTE.getEntrySet().stream().map(attribute -> Map.entry(attribute.getKey().toString(), attribute.getValue()))
-				.sorted((a, b) -> a.getKey().compareToIgnoreCase(b.getKey())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> a, LinkedHashMap::new));
-		String firstAttribute = ATTRIBUTES.keySet().stream().findFirst().get();
+		ATTRIBUTES = MVRegistry.ATTRIBUTE.getEntrySet().stream()
+				.map(attribute -> Map.entry(attribute.getKey().toString(), attribute.getValue()))
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> a, LinkedHashMap::new));
+		DISPLAY_NAME_TO_ID = new LinkedHashMap<>();
+		ID_TO_DISPLAY_NAME = new LinkedHashMap<>();
+		for (Map.Entry<String, Attribute> e : ATTRIBUTES.entrySet()) {
+			// 使用 attribute.getDescriptionId() 对应的翻译（"attribute.name.generic.max_health" 等）
+			String displayName = TextInst.translatable(e.getValue().getDescriptionId()).getString();
+			DISPLAY_NAME_TO_ID.put(displayName, e.getKey());
+			ID_TO_DISPLAY_NAME.put(e.getKey(), displayName);
+		}
+		// 按显示名称排序（和附魔下拉框一致）
+		LinkedHashMap<String, String> sortedDisplayToId = DISPLAY_NAME_TO_ID.entrySet().stream()
+				.sorted((a, b) -> a.getKey().compareToIgnoreCase(b.getKey()))
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> a, LinkedHashMap::new));
+		DISPLAY_NAME_TO_ID.clear();
+		DISPLAY_NAME_TO_ID.putAll(sortedDisplayToId);
+		String firstAttribute = DISPLAY_NAME_TO_ID.keySet().stream().findFirst().get();
+		
+		List<String> orderedDisplayNames = new ArrayList<>(DISPLAY_NAME_TO_ID.keySet());
 		
 		ConfigCategory visibleBase = new ConfigCategory();
 		visibleBase.setConfigurable("attribute", new ConfigItem<>(TextInst.translatable("nbteditor.attributes.attribute"), ConfigValueDropdown.forList(
-				firstAttribute, firstAttribute, new ArrayList<>(ATTRIBUTES.keySet()))));
+				firstAttribute, firstAttribute, orderedDisplayNames)));
 		visibleBase.setConfigurable("amount", new ConfigBar()
 				.setConfigurable("number", new ConfigItem<>(TextInst.translatable("nbteditor.attributes.base"),
 						ConfigValueNumber.forDouble(0, 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY)))
@@ -86,7 +111,7 @@ public class AttributesScreen<L extends LocalNBT> extends LocalEditorScreen<L> {
 		
 		ConfigCategory visible = new ConfigCategory();
 		visible.setConfigurable("attribute", new ConfigItem<>(TextInst.translatable("nbteditor.attributes.attribute"), ConfigValueDropdown.forList(
-				firstAttribute, firstAttribute, new ArrayList<>(ATTRIBUTES.keySet()))));
+				firstAttribute, firstAttribute, orderedDisplayNames)));
 		visible.setConfigurable("operation", new ConfigItem<>(TextInst.translatable("nbteditor.attributes.operation"), ConfigValueDropdown.forEnum(
 				AttributeModifierData.Operation.ADD, AttributeModifierData.Operation.ADD, AttributeModifierData.Operation.class)));
 		visible.setConfigurable("amount", new ConfigBar()
@@ -136,7 +161,10 @@ public class AttributesScreen<L extends LocalNBT> extends LocalEditorScreen<L> {
 			ConfigHiddenDataNamed<ConfigCategory, AttributeModifierId> hiddenAttributeConfig = entry.clone(true);
 			ConfigCategory attributeConfig = hiddenAttributeConfig.getVisible();
 			
-			getConfigAttribute(attributeConfig).setValue(MVRegistry.ATTRIBUTE.getId(attribute.attribute()).toString());
+			String attrId = MVRegistry.ATTRIBUTE.getId(attribute.attribute()).toString();
+			// 回显：注册表 id → 显示名称（找不到翻译时回退为 id 字符串）
+			String displayName = ID_TO_DISPLAY_NAME.getOrDefault(attrId, attrId);
+			getConfigAttribute(attributeConfig).setValue(displayName);
 			getConfigAmount(attributeConfig).setValue(attribute.value());
 			
 			if (modifiers) {
@@ -157,7 +185,10 @@ public class AttributesScreen<L extends LocalNBT> extends LocalEditorScreen<L> {
 						(ConfigHiddenDataNamed<ConfigCategory, AttributeModifierId>) path;
 				ConfigCategory attributeConfig = hiddenAttributeConfig.getVisible();
 				
-				Attribute attribute = ATTRIBUTES.get(getConfigAttribute(attributeConfig).getValidValue());
+				String displayName = getConfigAttribute(attributeConfig).getValidValue();
+				// 保存：显示名称 → 注册表 id；找不到时（极端情况）回退为自身（旧文件格式兼容）
+				String attrId = DISPLAY_NAME_TO_ID.getOrDefault(displayName, displayName);
+				Attribute attribute = ATTRIBUTES.get(attrId);
 				double amount = getConfigAmount(attributeConfig).getValidValue();
 				
 				if (modifiers) {

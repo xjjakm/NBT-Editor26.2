@@ -728,17 +728,17 @@ public class FormattedTextFieldWidget extends GroupWidget {
 				Component btnText;
 				MVTooltip btnTooltip;
 				if (formatting == ChatFormatting.RESET) {
-					btnText = TextInst.of("");
+					btnText = TextInst.literal(formatting.name().substring(0, 1));
 					if (ConfigScreen.isKeybindsHidden())
-						btnTooltip = new MVTooltip(TextInst.of(MVMisc.getChatFormattingName(formatting)));
+						btnTooltip = new MVTooltip(MVMisc.getChatFormattingNameComponent(formatting));
 					else {
 						btnTooltip = new MVTooltip(
-								TextInst.of(MVMisc.getChatFormattingName(formatting)),
+								MVMisc.getChatFormattingNameComponent(formatting),
 								TextInst.translatable("nbteditor.keybind.formatted_text.reset"));
 					}
 				} else {
 					btnText = TextInst.literal(formatting.name().substring(0, 1)).formatted(formatting);
-					btnTooltip = new MVTooltip(TextInst.of(MVMisc.getChatFormattingName(formatting)));
+					btnTooltip = new MVTooltip(MVMisc.getChatFormattingNameComponent(formatting));
 				}
 				addWidget(MVMisc.newButton(
 						afterColorsX + 24 + i * 20 + (formatting == ChatFormatting.RESET ? 4 + 20 * 3 + 4 : 0), y, 20, 20,
@@ -766,7 +766,7 @@ public class FormattedTextFieldWidget extends GroupWidget {
 		}
 	}
 	private MVTooltip createColorButtonTooltip(ChatFormatting color) {
-		Component name = TextInst.of(MVMisc.getChatFormattingName(color));
+		Component name = MVMisc.getChatFormattingNameComponent(color);
 		if (ConfigScreen.isKeybindsHidden() || !StyleUtil.SHADOW_COLOR_EXISTS)
 			return new MVTooltip(name);
 		return new MVTooltip(name, TextInst.translatable("nbteditor.keybind.formatted_text.shadow"));
