@@ -41,7 +41,7 @@
   "accessWidener": "nbteditor.accesswidener",
 
   "depends": {
-    "fabricloader": "${loader_version}",
+    "fabricloader": ">=${loader_version}",
     "fabric-api": "*",
     "java": ">=25"
   },
