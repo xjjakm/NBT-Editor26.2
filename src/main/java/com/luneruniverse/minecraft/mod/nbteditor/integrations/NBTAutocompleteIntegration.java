@@ -11,7 +11,7 @@ import com.mojang.brigadier.context.StringRange;
 import com.mojang.brigadier.suggestion.Suggestion;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import com.mt1006.nbt_ac.autocomplete.NbtSuggestionManager;
+import net.mt1006.nbtac.autocomplete.SuggestionManager;
 import net.minecraft.commands.arguments.item.ItemParser;
 import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -19,6 +19,8 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.Identifier;
+
+import net.fabricmc.loader.api.FabricLoader;
 
 import java.util.Collection;
 import java.util.List;
@@ -36,7 +38,8 @@ public class NBTAutocompleteIntegration extends Integration {
 	}
 	private static Suggestion shiftSuggestion(Suggestion suggestion, int shift) {
 		Suggestion shiftedSuggestion = new Suggestion(shiftRange(suggestion.getRange(), shift), suggestion.getText(), suggestion.getTooltip());
-		NbtSuggestionManager.subtextMap.put(shiftedSuggestion, NbtSuggestionManager.subtextMap.remove(suggestion));
+		// 2.0.1: subtextMap 改名为 dataMap（值类型变为 CustomSuggestion.Data，put/remove 仍兼容）
+		SuggestionManager.dataMap.put(shiftedSuggestion, SuggestionManager.dataMap.remove(suggestion));
 		return shiftedSuggestion;
 	}
 	
@@ -44,7 +47,23 @@ public class NBTAutocompleteIntegration extends Integration {
 	
 	@Override
 	public String getModId() {
+		// 旧版本 mod id 为 "nbt_ac"，2.0.1+ 改为 "nbtac"（无下划线）
 		return "nbt_ac";
+	}
+	
+	// 新版 mod id 检测结果缓存（isLoaded override 用）
+	private Boolean newIdLoaded;
+	
+	@Override
+	public boolean isLoaded() {
+		// 先匹配旧 mod id "nbt_ac"
+		if (super.isLoaded()) return true;
+		// 再匹配 2.0.1+ 的新 mod id "nbtac"
+		if (newIdLoaded == null) {
+			newIdLoaded = FabricLoader.getInstance().getAllMods().stream()
+					.anyMatch(mod -> mod.getMetadata().getId().equals("nbtac"));
+		}
+		return newIdLoaded;
 	}
 	
 	private CompletableFuture<Suggestions> getSuggestions(String type, Identifier id, Tag nbt, List<String> path, String key, String value, int cursor, Collection<String> otherTags) {
@@ -173,7 +192,9 @@ public class NBTAutocompleteIntegration extends Integration {
 			return new ItemParser((MainUtil.client.getConnection() == null ? VanillaRegistries.createLookup() : MainUtil.client.getConnection().registryAccess())).fillSuggestions(builder).thenApply(suggestions -> new Suggestions(shiftRange(suggestions.getRange(), -shift), suggestions.getList().stream()
                     .map(suggestion -> shiftSuggestion(suggestion, -shift)).collect(Collectors.toList())));
 		}
-		return NbtSuggestionManager.loadFromName(name, tag, new SuggestionsBuilder(tag, 0), false);
+		// 2.0.1: loadFromName(name, input, builder, dispatchImmediately) → get(input, name, builder, suggestPath)
+		// 参数顺序交换：旧的 (name, tag) 现在是 (tag, name)
+		return SuggestionManager.get(tag, name, new SuggestionsBuilder(tag, 0), false);
 	}
 	
 	public CompletableFuture<Suggestions> getSuggestions(LocalNBT nbt, List<String> path, String key, String value, int cursor, Collection<String> otherTags) {
