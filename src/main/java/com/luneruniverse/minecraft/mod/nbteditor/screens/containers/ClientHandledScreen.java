@@ -115,8 +115,8 @@ public class ClientHandledScreen extends ContainerScreen implements OldEventBeha
 	protected void drawForeground(Matrix3x2fStack matrices, int mouseX, int mouseY) {
 		getLockedSlotsInfo().renderLockedHighlights(matrices, menu, true, false, true);
 		
-		MVDrawableHelper.drawTextWithoutShadow(matrices, font, getRenderedTitle(), titleLabelX, titleLabelY, 4210752);
-		MVDrawableHelper.drawTextWithoutShadow(matrices, font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, 4210752);
+		MVDrawableHelper.drawTextWithoutShadow(matrices, font, getRenderedTitle(), titleLabelX, titleLabelY, -12566464);
+		MVDrawableHelper.drawTextWithoutShadow(matrices, font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, -12566464);
 	}
 	@Override
 	protected final void extractLabels(GuiGraphicsExtractor context, int mouseX, int mouseY) {

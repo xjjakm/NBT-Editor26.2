@@ -60,7 +60,12 @@ public class ServerMixinLink {
 		ClientPlayNetworkHandler = ClientPlayNetworkHandler_holder;
 	}
 	public static boolean isInstanceOfClientPlayNetworkHandlerSafely(PacketListener listener) {
-		return ClientPlayNetworkHandler != null && ClientPlayNetworkHandler.isInstance(listener);
+		if (listener == null)
+			return false;
+		if (ClientPlayNetworkHandler != null)
+			return ClientPlayNetworkHandler.isInstance(listener);
+		// 26.1+: unobfuscated runtimes don't have the intermediary 'class_634' name, match the runtime class name
+		return "net.minecraft.client.multiplayer.ClientPacketListener".equals(listener.getClass().getName());
 	}
 	
 }

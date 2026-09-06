@@ -2,6 +2,8 @@ package com.luneruniverse.minecraft.mod.nbteditor.server;
 
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Reflection;
 import com.luneruniverse.minecraft.mod.nbteditor.multiversion.Version;
+import com.luneruniverse.minecraft.mod.nbteditor.util.MainUtil;
+import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permission;
@@ -68,10 +70,23 @@ public class ServerMVMisc {
 	private static final Supplier<Reflection.MethodInvoker> Entity_hasPermissionLevel =
 			Reflection.getOptionalMethod(Entity.class, "method_5687", MethodType.methodType(boolean.class, int.class));
 	public static boolean hasPermissionLevel(Player player, int level) {
-		return Version.<Boolean>newSwitch()
-				.range("1.21.2", null, () -> player.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.byId(level))))
-				.range(null, "1.21.1", () -> Entity_hasPermissionLevel.get().invoke(player, level))
-				.get();
+		if (player instanceof ServerPlayer) {
+			return Version.<Boolean>newSwitch()
+					.range("1.21.2", null, () -> player.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.byId(level))))
+					.range(null, "1.21.1", () -> Entity_hasPermissionLevel.get().invoke(player, level))
+					.get();
+		}
+		
+		// Client player (LocalPlayer): in 26.2 the client's PermissionSet is only synced by the integrated
+		// server when publishing to LAN or toggling allow-commands, so it usually stays NO_PERMISSIONS.
+		// Query the integrated server directly; on multiplayer the client cannot know the permission level.
+		if (NBTEditorServer.IS_DEDICATED)
+			return false;
+		IntegratedServer server = MainUtil.client.getSingleplayerServer();
+		if (server == null)
+			return false;
+		return server.getProfilePermissions(player.nameAndId())
+				.hasPermission(new Permission.HasCommandLevel(PermissionLevel.byId(level)));
 	}
 	
 	private static final Supplier<Reflection.MethodInvoker> Property_getValues =
